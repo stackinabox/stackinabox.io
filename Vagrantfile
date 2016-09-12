@@ -21,8 +21,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     config.vm.define "opdk" do |opdk|
 
-      openstack.vm.box = "stackinabox/opdk"
-      openstack.vm.box_version = ">= 0.9.3"
+      opdk.vm.box = "stackinabox/opdk"
+      opdk.vm.box_version = "= 0.9.3"
 
       # eth1, this will be OpenStacks's "management" network
       opdk.vm.network "private_network", ip: "192.168.27.100", adapter_ip: "192.168.27.1", netmask: "255.255.255.0", auto_config: true
