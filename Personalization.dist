@@ -1,0 +1,11 @@
+# Which OpenStack theme to use on the Horizon dashboard (bluebox or openstack)
+$os_theme = "bluebox"
+
+# Use NFS? (won't work on windows)
+$use_nfs = false
+
+# Number of CPU's (min 2, recommend 4) adjust to your machine
+$cpus = 4
+
+# Amount of RAM (min 4096, recommed 8192) adjust to your machine
+$memory = 8192

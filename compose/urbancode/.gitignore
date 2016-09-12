@@ -1,0 +1,26 @@
+# ignore all dotfiles by except git specific ones
+.*
+!.gitignore
+!.git*
+!.travis.yml
+
+# ignore all temporary files and ahp specific files
+*.bak
+*.bom
+*.swp
+*.priv
+*~
+
+# ignore compilation related directories in the root of the project
+/dist
+/lib
+/ecbin
+/artifacts
+*.zip
+
+# don't ignore the .volumes directory
+!/.volumes
+
+build.rc
+latest.txt
+

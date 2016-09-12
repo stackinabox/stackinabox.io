@@ -1,0 +1,121 @@
+version: '2'
+services:
+  blueprintdb:
+    image: postgres:9.6
+    container_name: blueprintdb
+    environment:
+      - POSTGRES_PASSWORD=aWJtX3VjZHAK 
+      - POSTGRES_USER=ibm_ucdp 
+      - POSTGRES_DATABASE=ibm_ucdp
+    ports:
+      - "55432:5432"
+    restart: always
+  ucddb:
+    image: mysql:5.6
+    container_name: ucddb
+    environment:
+      - MYSQL_ROOT_PASSWORD=aWJtX3VjZHAK
+      - MYSQL_USER=ibm_ucd
+      - MYSQL_PASSWORD=passw0rd
+      - MYSQL_DATABASE=ibm_ucd
+    ports:
+      - "33306:3306"
+    restart: always
+  ucd:
+    image: stackinabox/urbancode-deploy:6.2.1.2.801550
+    container_name: ucd
+    ports:
+      - "7918:7918"
+      - "8080:8080"
+      - "8443:8443"
+    network_mode: "host"
+    depends_on:
+      - ucddb
+    environment:
+      - LICENSE=accept
+      - DATABASE_USER=ibm_ucd
+      - DATABASE_PASS=passw0rd
+      - DATABASE_NAME=ibm_ucd
+      - DATABASE_PORT=33306
+      - DATABASE_HOST=192.168.27.100
+      - DEPLOY_SERVER_URL=http://192.168.27.100:8080
+      - DEPLOY_SERVER_HOSTNAME=192.168.27.100
+      - ADD_CLOUD_AGENT_PKGS=true
+    restart: always
+    volumes:
+      - /vagrant/compose/urbancode/.volumes/ucd/cache:/cache
+  agent:
+    image: stackinabox/urbancode-deploy-agent:6.2.2.0.819509
+    container_name: agent
+    environment:
+      - DEPLOY_SERVER_HOSTNAME=192.168.27.100
+      - DEPLOY_SERVER_URL=http://192.168.27.100:8080
+      - AGENT_NAME=importagent
+    depends_on:
+      - ucd
+    restart: always
+    volumes: 
+      - /vagrant/compose/urbancode/.volumes/agent/file-imports:/file-import
+  heatengine:
+    image: stackinabox/urbancode-patterns-engine:6.2.1.2.801498
+    container_name: heatengine
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /vagrant/compose/urbancode/envvars.txt:/root/envvars.txt:ro
+    ports:
+      - "8000:8000"
+      - "8003:8003"
+      - "8004:8004"
+    expose:
+      - "5000"
+      - "5672"
+      - "35357"
+    restart: always
+  blueprintdesigner:
+    image: stackinabox/urbancode-patterns-designer:6.2.1.2.801569
+    container_name: blueprintdesigner
+    ports:
+      - "9080:9080" 
+      - "9443:9443"
+      - "7575:7575"
+    network_mode: "host"
+    depends_on:
+      - blueprintdb
+      - ucd
+      - heatengine
+    environment:
+      - WEB_SERVER_HOSTNAME=192.168.27.100
+      - KEYSTONE_URL=http://192.168.27.100:5000/v2.0/
+      - KEYSTONE_ADMIN_USER=admin
+      - KEYSTONE_ADMIN_PASS=labstack
+      - KEYSTONE_ADMIN_TENANT=admin
+      - KEYSTONE_USER=demo
+      - KEYSTONE_PASS=labstack
+      - KEYSTONE_TENANT=demo
+      - KEYSTONE_DOMAIN=Default
+      - DATABASE_HOST=192.168.27.100
+      - DATABASE_PORT=55432
+      - DATABASE_NAME=ibm_ucdp
+      - DATABASE_USER=ibm_ucdp
+      - DATABASE_PASS=aWJtX3VjZHAK
+      - ENGINE_HOST=192.168.27.100
+      - DEPLOY_SERVER_URL=http://192.168.27.100:8080
+      - DOCKER_HOST=192.167.27.100
+      - DOCKER_PORT=2376
+      - DOCKER_PROTO=http
+    restart: always
+    volumes:
+      - /vagrant/tutorial/:/opt/ibm-ucd-patterns/opt/tomcat/webapps/landscaper/static/6.2.1.2.801569/js/tutorial/nls/
+  agent-relay:
+    image: stackinabox/urbancode-deploy-agent-relay:6.2.2.0.818541
+    container_name: agent-relay
+    ports:
+      - "20080:20080"
+      - "20081:20081"
+      - "7916:7916"
+    environment:
+      - UCD_SERVER=192.168.27.100
+    depends_on:
+      - blueprintdesigner
+    restart: always

@@ -1,0 +1,225 @@
+version: '2'
+services:
+  blueprintdb:
+    image: postgres:9.6
+    container_name: blueprintdb
+    hostname: blueprintdb
+    domainname: stackinabox.io
+    networks:
+      - stackinabox.io
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_PASSWORD=aWJtX3VjZHAK 
+      - POSTGRES_USER=ibm_ucdp 
+      - POSTGRES_DATABASE=ibm_ucdp
+    extra_hosts:
+      - "ucd.stackinabox.io:192.168.27.100"
+      - "openstack.stackinabox.io:192.168.27.100"
+      - "heat.stackinabox.io:192.168.27.100"
+      - "designer.stackinabox.io:192.168.27.100"
+      - "agentrelay.stackinabox.io:192.168.27.100"
+      - "importagent.stackinabox.io:192.168.27.100"
+      - "ucddb.stackinabox.io:192.168.27.100"
+      - "bluebox.stackinabox.io:192.168.27.100"
+    restart: always
+  ucddb:
+    image: mysql:5.6
+    container_name: ucddb
+    hostname: ucddb
+    domainname: stackinabox.io
+    networks:
+      - stackinabox.io
+    expose:
+      - "3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=aWJtX3VjZHAK
+      - MYSQL_USER=ibm_ucd
+      - MYSQL_PASSWORD=passw0rd
+      - MYSQL_DATABASE=ibm_ucd
+    extra_hosts:
+      - "ucd.stackinabox.io:192.168.27.100"
+      - "openstack.stackinabox.io:192.168.27.100"
+      - "heat.stackinabox.io:192.168.27.100"
+      - "designer.stackinabox.io:192.168.27.100"
+      - "agentrelay.stackinabox.io:192.168.27.100"
+      - "importagent.stackinabox.io:192.168.27.100"
+      - "blueprintdb.stackinabox.io:192.168.27.100"
+      - "bluebox.stackinabox.io:192.168.27.100"
+    restart: always
+  ucd:
+    image: stackinabox/urbancode-deploy:6.2.1.2.801550
+    container_name: ucd
+    hostname: ucd
+    domainname: stackinabox.io
+    networks:
+      - stackinabox.io
+    ports:
+      - "7918:7918"
+      - "8080:8080"
+      - "8443:8443"
+    depends_on:
+      - ucddb
+    links:
+      - ucddb
+    extra_hosts:
+      - "openstack.stackinabox.io:192.168.27.100"
+      - "heat.stackinabox.io:192.168.27.100"
+      - "designer.stackinabox.io:192.168.27.100"
+      - "agentrelay.stackinabox.io:192.168.27.100"
+      - "importagent.stackinabox.io:192.168.27.100"
+      - "blueprintdb.stackinabox.io:192.168.27.100"
+      - "ucddb.stackinabox.io:192.168.27.100"
+      - "bluebox.stackinabox.io:192.168.27.100"
+    environment:
+      - LICENSE=accept
+      - DATABASE_USER=ibm_ucd
+      - DATABASE_PASS=passw0rd
+      - DATABASE_NAME=ibm_ucd
+      - DATABASE_PORT=3306
+      - DATABASE_HOST=ucddb
+      - DEPLOY_SERVER_URL=http://ucd.stackinabox.io:8080
+      - DEPLOY_SERVER_HOSTNAME=ucd.stackinabox.io
+      - ADD_CLOUD_AGENT_PKGS=true
+    restart: always
+    volumes:
+      - /vagrant/compose/urbancode/.volumes/ucd/cache:/cache
+  importagent:
+    image: stackinabox/urbancode-deploy-agent:6.2.2.0.819509
+    container_name: importagent
+    hostname: importagent
+    domainname: stackinabox.io
+    networks:
+      - stackinabox.io
+    environment:
+      - DEPLOY_SERVER_HOSTNAME=ucd.stackinabox.io
+      - DEPLOY_SERVER_URL=http://ucd.stackinabox.io:8080
+      - AGENT_NAME=importagent
+    depends_on:
+      - ucd
+    links:
+      - ucd
+    extra_hosts:
+      - "ucd.stackinabox.io:192.168.27.100"
+      - "openstack.stackinabox.io:192.168.27.100"
+      - "heat.stackinabox.io:192.168.27.100"
+      - "designer.stackinabox.io:192.168.27.100"
+      - "agentrelay.stackinabox.io:192.168.27.100"
+      - "blueprintdb.stackinabox.io:192.168.27.100"
+      - "ucddb.stackinabox.io:192.168.27.100"
+      - "bluebox.stackinabox.io:192.168.27.100"
+    restart: always
+    volumes: 
+      - /vagrant/compose/urbancode/.volumes/agent/file-import:/file-import
+  heat:
+    image: stackinabox/urbancode-patterns-engine:6.2.1.2.801498
+    container_name: heat
+    hostname: heat
+    domainname: stackinabox.io
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /vagrant/compose/urbancode/envvars.txt:/root/envvars.txt:ro
+    networks:
+      - stackinabox.io
+    ports:
+      - "8000:8000"
+      - "8003:8003"
+      - "8004:8004"
+    expose:
+      - "5000"
+      - "5672"
+      - "35357"
+    environment:
+      - ALLOWED_AUTH_URIS=http://openstack.stackinabox.io:5000/v2.0/
+    extra_hosts:
+      - "ucd.stackinabox.io:192.168.27.100"
+      - "openstack.stackinabox.io:192.168.27.100"
+      - "designer.stackinabox.io:192.168.27.100"
+      - "agentrelay.stackinabox.io:192.168.27.100"
+      - "importagent.stackinabox.io:192.168.27.100"
+      - "blueprintdb.stackinabox.io:192.168.27.100"
+      - "ucddb.stackinabox.io:192.168.27.100"
+      - "bluebox.stackinabox.io:192.168.27.100"
+    restart: always
+  designer:
+    image: stackinabox/urbancode-patterns-designer:6.2.1.2.801569
+    container_name: designer
+    hostname: designer
+    domainname: stackinabox.io
+    networks:
+      - stackinabox.io
+    ports:
+      - "9080:9080" 
+      - "9443:9443" 
+      - "7575:7575"
+    depends_on:
+      - blueprintdb
+      - ucd
+      - heat
+    links:
+      - blueprintdb
+      - ucd
+      - heat
+    extra_hosts:
+      - "ucd.stackinabox.io:192.168.27.100"
+      - "openstack.stackinabox.io:192.168.27.100"
+      - "heat.stackinabox.io:192.168.27.100"
+      - "agentrelay.stackinabox.io:192.168.27.100"
+      - "importagent.stackinabox.io:192.168.27.100"
+      - "blueprintdb.stackinabox.io:192.168.27.100"
+      - "ucddb.stackinabox.io:192.168.27.100"
+      - "bluebox.stackinabox.io:192.168.27.100"
+    environment:
+      - WEB_SERVER_HOSTNAME=designer.stackinabox.io
+      - KEYSTONE_URL=http://openstack.stackinabox.io:5000/v2.0/
+      - KEYSTONE_ADMIN_USER=admin
+      - KEYSTONE_ADMIN_PASS=labstack
+      - KEYSTONE_ADMIN_TENANT=admin
+      - KEYSTONE_USER=demo
+      - KEYSTONE_PASS=labstack
+      - KEYSTONE_TENANT=demo
+      - KEYSTONE_DOMAIN=Default
+      - DATABASE_HOST=blueprintdb
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=ibm_ucdp
+      - DATABASE_USER=ibm_ucdp
+      - DATABASE_PASS=aWJtX3VjZHAK
+      - ENGINE_HOST=heat.stackinabox.io
+      - DEPLOY_SERVER_URL=http://ucd.stackinabox.io:8080
+      - DOCKER_HOST=docker.stackinabox.io
+      - DOCKER_PORT=2376
+      - DOCKER_PROTO=http
+    restart: always
+    volumes:
+      - /vagrant/tutorial/:/opt/ibm-ucd-patterns/opt/tomcat/webapps/landscaper/static/6.2.1.2.801569/js/tutorial/nls/
+  agentrelay:
+    image: stackinabox/urbancode-deploy-agent-relay:6.2.2.0.818541
+    container_name: agentrelay
+    hostname: agentrelay
+    domainname: stackinabox.io
+    networks:
+      - stackinabox.io
+    ports:
+      - "20080:20080"
+      - "20081:20081"
+      - "7916:7916"
+    environment:
+      - UCD_SERVER=ucd.stackinabox.io
+    depends_on:
+      - ucd
+    links:
+      - ucd
+    extra_hosts:
+      - "ucd.stackinabox.io:192.168.27.100"
+      - "openstack.stackinabox.io:192.168.27.100"
+      - "heat.stackinabox.io:192.168.27.100"
+      - "designer.stackinabox.io:192.168.27.100"
+      - "importagent.stackinabox.io:192.168.27.100"
+      - "blueprintdb.stackinabox.io:192.168.27.100"
+      - "ucddb.stackinabox.io:192.168.27.100"
+      - "bluebox.stackinabox.io:192.168.27.100"
+    restart: always
+
+networks:
+  stackinabox.io:
