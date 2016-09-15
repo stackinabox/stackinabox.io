@@ -7,8 +7,8 @@ services:
       - POSTGRES_PASSWORD=aWJtX3VjZHAK 
       - POSTGRES_USER=ibm_ucdp 
       - POSTGRES_DATABASE=ibm_ucdp
-    ports:
-      - "55432:5432"
+    expose:
+      - "5432"
     restart: always
   ucddb:
     image: mysql:5.6
@@ -18,17 +18,20 @@ services:
       - MYSQL_USER=ibm_ucd
       - MYSQL_PASSWORD=passw0rd
       - MYSQL_DATABASE=ibm_ucd
-    ports:
-      - "33306:3306"
+    expose:
+      - "3306"
     restart: always
   ucd:
     image: stackinabox/urbancode-deploy:6.2.1.2.801550
     container_name: ucd
     ports:
-      - "7918:7918"
-      - "8080:8080"
-      - "8443:8443"
-    network_mode: "host"
+      - "192.168.27.100:7918:7918"
+      - "192.168.27.100:8080:8080"
+      - "192.168.27.100:8443:8443"
+    expose:
+      - "7918"
+      - "8080"
+      - "8443"
     depends_on:
       - ucddb
     environment:
@@ -36,14 +39,16 @@ services:
       - DATABASE_USER=ibm_ucd
       - DATABASE_PASS=passw0rd
       - DATABASE_NAME=ibm_ucd
-      - DATABASE_PORT=33306
-      - DATABASE_HOST=192.168.27.100
+      - DATABASE_PORT=3306
+      - DATABASE_HOST=ucddb
       - DEPLOY_SERVER_URL=http://192.168.27.100:8080
       - DEPLOY_SERVER_HOSTNAME=192.168.27.100
       - ADD_CLOUD_AGENT_PKGS=true
-    restart: always
+    restart: "on-failure:2"
     volumes:
       - /vagrant/compose/urbancode/.volumes/ucd/cache:/cache
+      - /vagrant/compose/urbancode/wait-for-it.sh:/usr/local/bin/wait-for-it.sh
+    entrypoint: "wait-for-it.sh ucddb:3306 --timeout=60 -- /opt/startup.sh"
   agent:
     image: stackinabox/urbancode-deploy-agent:6.2.2.0.819509
     container_name: agent
@@ -64,22 +69,28 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - /vagrant/compose/urbancode/envvars.txt:/root/envvars.txt:ro
     ports:
-      - "8000:8000"
-      - "8003:8003"
-      - "8004:8004"
+      - "192.168.27.100:8000:8000"
+      - "192.168.27.100:8003:8003"
+      - "192.168.27.100:8004:8004"
     expose:
       - "5000"
       - "5672"
+      - "8000"
+      - "8003"
+      - "8004"
       - "35357"
     restart: always
   blueprintdesigner:
     image: stackinabox/urbancode-patterns-designer:6.2.1.2.801569
     container_name: blueprintdesigner
     ports:
-      - "9080:9080" 
-      - "9443:9443"
-      - "7575:7575"
-    network_mode: "host"
+      - "192.168.27.100:9080:9080" 
+      - "192.168.27.100:9443:9443"
+      - "192.168.27.100:7575:7575"
+    expose:
+      - "9080" 
+      - "9443"
+      - "7575"
     depends_on:
       - blueprintdb
       - ucd
@@ -94,8 +105,8 @@ services:
       - KEYSTONE_PASS=labstack
       - KEYSTONE_TENANT=demo
       - KEYSTONE_DOMAIN=Default
-      - DATABASE_HOST=192.168.27.100
-      - DATABASE_PORT=55432
+      - DATABASE_HOST=blueprintdb
+      - DATABASE_PORT=5432
       - DATABASE_NAME=ibm_ucdp
       - DATABASE_USER=ibm_ucdp
       - DATABASE_PASS=aWJtX3VjZHAK
@@ -104,18 +115,34 @@ services:
       - DOCKER_HOST=192.167.27.100
       - DOCKER_PORT=2376
       - DOCKER_PROTO=http
-    restart: always
+    restart: "on-failure:10"
     volumes:
       - /vagrant/tutorial/:/opt/ibm-ucd-patterns/opt/tomcat/webapps/landscaper/static/6.2.1.2.801569/js/tutorial/nls/
+      - /vagrant/compose/urbancode/wait-for-it.sh:/usr/local/bin/wait-for-it.sh
+    entrypoint: "wait-for-it.sh blueprintdb:5432 --timeout=60 -- wait-for-it.sh ucd:8080 --timeout=300 -- wait-for-it.sh heatengine:8004 --timeout=300 -- /opt/startup.sh"
   agent-relay:
     image: stackinabox/urbancode-deploy-agent-relay:6.2.2.0.818541
     container_name: agent-relay
     ports:
-      - "20080:20080"
-      - "20081:20081"
-      - "7916:7916"
+      - "192.168.27.100:20080:20080"
+      - "192.168.27.100:20081:20081"
+      - "192.168.27.100:7916:7916"
+    expose:
+      - "20080"
+      - "20081"
+      - "7916"
     environment:
       - UCD_SERVER=192.168.27.100
     depends_on:
       - blueprintdesigner
     restart: always
+
+networks:
+  default: 
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: "stackbr0"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.bridge.enable_icc: "true"
+      om.docker.network.bridge.host_binding_ipv4: "192.168.27.100"
+      com.docker.network.mtu: "1450"

@@ -1,6 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+ENV["LC_ALL"] = "C.UTF-8"
+ENV["LANG"] = "C.UTF-8"
+
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
@@ -22,7 +25,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.define "opdk" do |opdk|
 
       opdk.vm.box = "stackinabox/opdk"
-      opdk.vm.box_version = "= 0.9.3"
+      opdk.vm.box_version = "= 0.9.4"
 
       # eth1, this will be OpenStacks's "management" network
       opdk.vm.network "private_network", ip: "192.168.27.100", adapter_ip: "192.168.27.1", netmask: "255.255.255.0", auto_config: true
@@ -34,13 +37,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.ssh.insert_key = false
 
       if Vagrant.has_plugin?("vagrant-docker-compose")
+        # sometimes is takes a second to get docker to startup
+        opdk.vm.provision "shell", inline: "sleep 20 || sudo systemctl restart docker.service || sleep 20", run: "always"
         opdk.vm.provision :docker
         opdk.vm.provision :docker_compose, 
           yml: "/vagrant/compose/urbancode/docker-compose.yml",
-          command_options: { up: "-d --timeout 60"}, 
-          run: "always",
+          command_options: { rm: "", up: "-d --no-recreate --timeout 10"}, 
           project_name: "urbancode",
-          compose_version: "1.8.0"
+          compose_version: "1.8.0",
+          env: { DOCKER_HOST: "192.168.27.100:2375" },
+          run: "always"
       else
         print "\n"
         print "vagrant-docker-compose plugin has not been found.\n"
