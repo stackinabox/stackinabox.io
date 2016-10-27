@@ -166,3 +166,6 @@ Retrying the `vagrant up` command should now produce the following output to sta
 Bringing machine 'opdk' up with 'virtualbox' provider...
 ==> opdk: Importing base box 'stackinabox/opdk'...
 ```
+
+#### `ttyname failed` and `Inappropriate ioctl for device` messages
+See this [issue](https://github.com/stackinabox/stackinabox.io/issues/1).
