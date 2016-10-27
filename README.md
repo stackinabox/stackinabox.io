@@ -2,57 +2,59 @@
 
 ## Introduction
 
-This vagrant project will stand up a single Ubuntu 14.04 running OpenStack Liberty and Docker using Virtualbox. It will pull Docker images for [UrbanCode Deploy](https://hub.docker.com/r/stackinabox/urbancode-deploy/), [UrbanCode Deploy Agent](https://hub.docker.com/r/stackinabox/urbancode-deploy-agent/), [UrbanCode Patterns Blueprint Designer](https://hub.docker.com/r/stackinabox/urbancode-patterns-designer/), and [UrbanCode Patterns Engine](https://hub.docker.com/r/stackinabox/urbancode-patterns-engine/).  Using this vagrant image, once running using vagrant up, you'll be able to design and develop OpenStack HEAT based cloud automation that you can use to deploy applications to the embedded [OpenStack](https://www.blueboxcloud.com/) or to any other cloud provider supported by [UrbanCode Deploy's Blueprint Designer](https://developer.ibm.com/urbancode/products/urbancode-deploy/features/blueprint-designer/) ([Amazon Web Services](https://aws.amazon.com/), [Softlayer](http://www.softlayer.com/), [Azure](https://azure.microsoft.com/), or even your on-prem [VMware vCenter](https://www.vmware.com/products/vcenter-server)).
+This Vagrant project will stand up a single Ubuntu 14.04 VM running OpenStack Liberty and Docker using VirtualBox. The project will pull Docker images for [UrbanCode Deploy](https://hub.docker.com/r/stackinabox/urbancode-deploy/), [UrbanCode Deploy Agent](https://hub.docker.com/r/stackinabox/urbancode-deploy-agent/), [UrbanCode Patterns Blueprint Designer](https://hub.docker.com/r/stackinabox/urbancode-patterns-designer/), and [UrbanCode Patterns Engine](https://hub.docker.com/r/stackinabox/urbancode-patterns-engine/).  Using this Vagrant project, once running using `vagrant up`, you'll be able to design and develop OpenStack Heat-based cloud automation that you can use to deploy applications to the embedded [OpenStack](https://www.blueboxcloud.com/) (Mitaka) cloud or to any other cloud provider supported by [UrbanCode Deploy's Blueprint Designer](https://developer.ibm.com/urbancode/products/urbancode-deploy/features/blueprint-designer/) ([Amazon Web Services](https://aws.amazon.com/), [SoftLayer](http://www.softlayer.com/), [Azure](https://azure.microsoft.com/), or even your on-premise [VMware vCenter](https://www.vmware.com/products/vcenter-server)).
 
-Using this vagrant environment, it is hoped that you will share the automation that you develop to deploy applications to the cloud with the larger community.  For an example check out  [JKE Banking Application](https://github.com/stackinabox/jke)
+Using this Vagrant project, our hope is that you will share the automation that you develop to deploy applications to the cloud with the larger community.  For an example check out [JKE Banking Application](https://github.com/stackinabox/jke)
 
 ## Future Integrations
 
 It's planned to add further Docker images to this vagrant setup to support many other deployment automation tools such as:  
 
+  - [UrbanCode Build](https://developer.ibm.com/urbancode/products/urbancode-build/) (not yet implemented)
+  - [UrbanCode Release](https://developer.ibm.com/urbancode/products/urbancode-release/) (not yet implemented)
   - [Chef Server](https://www.chef.io/chef/) (not yet implemented)
   - [Salt Stack](https://saltstack.com/) (not yet implemented)
   - [Puppet](https://puppet.com/) (not yet implemented)
 
 ### Set Up Instructions
 
-#### Prerequisites  
-
-  ##### Download and Install locally:  
+##### Download and install these tools  
 
   - [Oracle VirtualBox](https://www.virtualbox.org/wiki/Downloads)  
-  - [Vagrant](https://www.vagrantup.com/downloads.html)  
+  - [Vagrant](https://www.vagrantup.com/downloads.html)
   - [Git](https://git-scm.com/) 
 
-  ##### Install required Vagrant plugins:  
+##### Install required Vagrant plugins  
+````
+vagrant plugin install vagrant-docker-compose
+vagrant plugin install vagrant-multi-hostsupdater
+```
+
+### Running `vagrant up`
+Verify that VirtualBox, Vagrant, and Git are installed and running by typing `vboxmanage help`, `vagrant help`, and `git help` at the command shell.  
+
+Execute these commands:
+````
+git clone https://github.com/stackinabox/stackinabox.io.git 
+cd stackinabox.io/vagrant
+vagrant up
+```
+
+The `vagrant up` command will take a while to complete.  The project will download the OPDK (Open Patterns Development Kit) VirtualBox VM from atlas.hashicorp.com. Once downloaded, Vagrant will launch the VM in VirtualBox in "headless" mode (no GUI).  When the VM is up, Docker Compose is used to start the UrbanCode products in multiple containers.  The Vagrant project will also set several entries in your machine's `hosts` file, and this step may prompt for a password.  Ultimately you will see this output at the end of process, which is the result of running `docker-compose up`.
 
 ````
-    # install a few required vagrant plugins
-    vagrant plugin install vagrant-docker-compose
-    vagrant plugin install vagrant-multi-hostsupdater
-````
+....
+==> opdk: Creating ucddb
+==> opdk: Creating heatengine
+==> opdk: Creating blueprintdb
+==> opdk: Creating ucd
+==> opdk: Creating blueprintdesigner
+==> opdk: Creating agent
+==> opdk: Creating agent-relay
+....
+```
 
-  ##### Launch the OPDK ( pronounced o-pee-doo-kee ) i.e. Open Patterns Development Kit   
-
-````
-    # stand up the OpenStack and UrbanCode environment
-	$: git clone https://github.com/stackinabox/stackinabox.io.git 
-	$: cd stackinabox.io/vagrant
-	$: vagrant up
-	....
-	==> opdk: Creating ucddb
-	==> opdk: Creating heatengine
-	==> opdk: Creating blueprintdb
-	==> opdk: Creating ucd
-	==> opdk: Creating blueprintdesigner
-	==> opdk: Creating agent
-	==> opdk: Creating agent-relay
-	....
-
-	# the "vagrant up" command will take a while to complete.  It will download the opdk.box Virtual Box vm image. Once downloaded it will launch the vm in Virtual Box in "Headless" mode (no gui).  To learn how to halt the vm or destroy and recreate the vm see below.
-````
-
-After executing the above you can open your local web browser to the [Blueprint Designer](http://designer.stackinabox.io:9080/) landscaper and login with demo/labstack.  The demo user is intended to be the user primarily used for building your automation.  The demo user belongs to a 'demo' team in the Blueprint Designer and has it's own tenant in the embedded [BlueBox](http://bluebox.stackinabox.io) that will be used to run any automation provisioned through the Blueprint Designer on the BlueBox server when logged in as the demo user.  Additional user login information is provided below, under the **Access Information** section, to gain access to the administration views for both the Blueprint Designer as well as for the BlueBox OpenStack Mitaka server.
+After the Vagrant machine is up, you can open your local web browser to the [Blueprint Designer](http://designer.stackinabox.io:9080/lanscaper) and login with `demo`/`labstack`.  The demo user is intended to be the primary user for building your automation.  The demo user belongs to a 'demo' team in the Blueprint Designer and has it's own tenant in the embedded [OpenStack](http://bluebox.stackinabox.io).  Additional login information is provided below.
 
 #### Install the example automated deployment application and assets   
 
