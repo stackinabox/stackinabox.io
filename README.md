@@ -2,7 +2,7 @@
 
 ## Introduction
 
-stackinabox.io is a Vagrant project that configures a single Ubuntu 14.04 VirtualBox VM running OpenStack and Docker. The project pulls Docker images for [UrbanCode Deploy](https://hub.docker.com/r/stackinabox/urbancode-deploy/), the [UrbanCode Deploy agent](https://hub.docker.com/r/stackinabox/urbancode-deploy-agent/), the [UrbanCode Deploy Blueprint Designer](https://hub.docker.com/r/stackinabox/urbancode-patterns-designer/), and the [UrbanCode Deploy Blueprint Designer Engine](https://hub.docker.com/r/stackinabox/urbancode-patterns-engine/).  Using this Vagrant project, once running using `vagrant up`, users are able to develop OpenStack Heat-based automation that is capable of deploying applications to the embedded [OpenStack](https://www.blueboxcloud.com/) instance or to any other cloud provider supported by [UrbanCode Deploy's Blueprint Designer](https://developer.ibm.com/urbancode/products/urbancode-deploy/features/blueprint-designer/) ([Amazon Web Services](https://aws.amazon.com/), [SoftLayer](http://www.softlayer.com/), [Azure](https://azure.microsoft.com/), or even your on-premise [VMware vCenter](https://www.vmware.com/products/vcenter-server)).
+stackinabox.io is a Vagrant project that configures a single Ubuntu 14.04 VirtualBox VM with OpenStack and Docker. The project pulls Docker images for [UrbanCode Deploy](https://hub.docker.com/r/stackinabox/urbancode-deploy/), the UrbanCode Deploy [agent](https://hub.docker.com/r/stackinabox/urbancode-deploy-agent/) and [relay](https://hub.docker.com/r/stackinabox/urbancode-deploy-agent-relay/), the [UrbanCode Deploy Blueprint Designer](https://hub.docker.com/r/stackinabox/urbancode-patterns-designer/), and the [Blueprint Designer Engine](https://hub.docker.com/r/stackinabox/urbancode-patterns-engine/).  Using this Vagrant project, users are able to develop OpenStack Heat-based automation to deploy complex, multiplatform applications to the embedded [OpenStack](https://www.blueboxcloud.com/) instance or to any other cloud provider supported by the [Blueprint Designer](https://developer.ibm.com/urbancode/products/urbancode-deploy/features/blueprint-designer/), including [Amazon Web Services](https://aws.amazon.com/), [SoftLayer](http://www.softlayer.com/), [Azure](https://azure.microsoft.com/), or even your on-premise [VMware vCenter](https://www.vmware.com/products/vcenter-server).
 
 Using stackinabox.io, our hope is that you will share the automation you develop with the larger community.  For an example, check out the [JKE Banking Application](https://github.com/stackinabox/jke).
 
@@ -57,11 +57,11 @@ The `vagrant up` command will take a while to complete.  The project will downlo
 After the Vagrant machine is up, you can open your local web browser to the [Blueprint Designer](http://designer.stackinabox.io:9080/lanscaper) and login with `demo`/`labstack`.  The demo user is intended to be the primary user for building your automation.  The demo user belongs to a 'demo' team in the Blueprint Designer and has it's own tenant in the embedded [OpenStack](http://bluebox.stackinabox.io).  Additional login information is provided below.
 
 ### Access Information
-[OPDK Web Terminal](http://192.168.27.100:4200/) - Available at http://192.168.27.100:4200/
+[OPDK Terminal](http://192.168.27.100:4200/) - Available at http://192.168.27.100:4200/
 - username: vagrant
 - password: vagrant
 
-OpenStack i.e. [BlueBox](http://openstack.stackinabox.io) - Available at http://openstack.stackinabox.io 
+[OpenStack](http://openstack.stackinabox.io) - Available at http://openstack.stackinabox.io 
 - username: demo
 - password: labstack  
 _____________________  
@@ -72,7 +72,7 @@ _____________________
 - username: admin
 - password: admin
 
-[UrbanCode Deploy Blueprint Designer](http://designer.stackinabox.io:9080/landscaper) (Heat Orchestration Template Designer) - Available at http://designer.stackinabox.io:9080/landscaper
+[Blueprint Designer](http://designer.stackinabox.io:9080/landscaper) (Heat Orchestration Template Designer) - Available at http://designer.stackinabox.io:9080/landscaper
 - username: demo
 - password: labstack  
 _____________________  
@@ -82,7 +82,7 @@ _____________________
 [UrbanCode Deploy Heat Engine](http://heat.stackinabox.io:8004) - Verify at http://heat.stackinabox.io:8004
 
 ### Install the JKE Sample
-Open your browser to the ["OPDK web terminal"](http://192.168.27.100:4200/).  Login and execute the following commands:
+Open your browser to the [OPDK web terminal](http://192.168.27.100:4200/).  Login and execute the following commands:
 ````
 git clone https://github.com/stackinabox/jke.git /vagrant/patterns/jke
 cd /vagrant/patterns/jke
@@ -114,4 +114,4 @@ vagrant up
 ```
 
 ### Connect the Blueprint Designer to AWS
-Open your browser to the ["OPDK web terminal"](http://192.168.27.100:4200/), login, and execute `~/aws-setup.sh`.  Then follow the instructions at the end of the script execution.
+Open your browser to the [OPDK web terminal](http://192.168.27.100:4200/), login, and execute `~/aws-setup.sh`.  Then follow the instructions at the end of the script execution.
