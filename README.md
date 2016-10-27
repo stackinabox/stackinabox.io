@@ -58,28 +58,21 @@ After the Vagrant machine is up, you can open your local web browser to the [Blu
 
 ### Access Information
 [OPDK Terminal](http://192.168.27.100:4200/) - Available at http://192.168.27.100:4200/
-- username: vagrant
-- password: vagrant
+Login with `vagrant`/`vagrant`
 
 [OpenStack](http://openstack.stackinabox.io) - Available at http://openstack.stackinabox.io 
-- username: demo
-- password: labstack  
-_____________________  
-- username: admin
-- password: labstack
+Login with `demo`/`labstack` or `admin`/`labstack`
 	 
 [UrbanCode Deploy Server](http://ucd.stackinabox.io:8080) - Available at http://ucd.stackinabox.io:8080
-- username: admin
-- password: admin
+Login with `admin`/`admin`
 
-[Blueprint Designer](http://designer.stackinabox.io:9080/landscaper) (Heat Orchestration Template Designer) - Available at http://designer.stackinabox.io:9080/landscaper
-- username: demo
-- password: labstack  
-_____________________  
-- username: ucdpadmin
-- password: ucdpadmin
-		 
+[Blueprint Designer](http://designer.stackinabox.io:9080/landscaper) (Heat Template Designer) - Available at http://designer.stackinabox.io:9080/landscaper
+Login with `demo`/`labstack` or `ucdpadmin`/`ucdpadmin`
+
 [UrbanCode Deploy Heat Engine](http://heat.stackinabox.io:8004) - Verify at http://heat.stackinabox.io:8004
+
+### Connect the Blueprint Designer to AWS
+Open your browser to the [OPDK web terminal](http://192.168.27.100:4200/), login, and execute `~/aws-setup.sh`.  Then follow the instructions at the end of the script execution.
 
 ### Install the JKE Sample
 Open your browser to the [OPDK web terminal](http://192.168.27.100:4200/).  Login and execute the following commands:
@@ -91,7 +84,7 @@ cd /vagrant/patterns/jke
 
 Open your browser to the [JKE Tutorial](http://designer.stackinabox.io:9080/landscaper/view/tutorial) and login with `demo`/`labstack`.  You will see a "Guided Tour" frame on the right side of the browser window.  Follow the instructions which will guide you on how to deploy the JKE sample using UrbanCode Deploy and Blueprint Designer.
 
-### Halt, Resume, or Destroy the Vagrant machine
+### Halt, Resume, or Destroy the Vagrant Machine
 You can run `vagrant global-status` to see a list of running Vagrant machines and their IDs.
 
 To halt/suspend a machine, naviagte to the directory where you cloned the stackinabox.io repository and execute `vagrant halt`:
@@ -112,6 +105,3 @@ cd /path/to/stackinabox.io/repo
 vagrant destroy <vagrant-env-id>
 vagrant up
 ```
-
-### Connect the Blueprint Designer to AWS
-Open your browser to the [OPDK web terminal](http://192.168.27.100:4200/), login, and execute `~/aws-setup.sh`.  Then follow the instructions at the end of the script execution.
