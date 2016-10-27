@@ -16,6 +16,7 @@ It's planned to add further Docker images to this vagrant setup to support many 
   - [Salt Stack](https://saltstack.com/) (not yet implemented)
   - [Puppet](https://puppet.com/) (not yet implemented)
 
+___
 ### Setup Instructions
 
 #### Download and install these tools  
@@ -56,6 +57,31 @@ The `vagrant up` command will take a while to complete.  The project will downlo
 
 After the Vagrant machine is up, you can open your local web browser to the [Blueprint Designer](http://designer.stackinabox.io:9080/lanscaper) and login with `demo`/`labstack`.  The demo user is intended to be the primary user for building your automation.  The demo user belongs to a 'demo' team in the Blueprint Designer and has it's own tenant in the embedded [OpenStack](http://bluebox.stackinabox.io).  Additional login information is provided below.
 
+### Halt, Resume, or Destroy the Vagrant Machine
+You can run `vagrant global-status` to see a list of running Vagrant machines and their IDs.
+
+#### Halt
+To halt/suspend a machine, naviagte to the directory where you cloned the stackinabox.io repository and execute `vagrant halt`:
+````
+cd /path/to/stackinabox.io/repo
+vagrant halt
+```
+
+#### Resume
+To resume a halted machine and restore all previous work/data:
+````
+cd /path/to/stackinabox.io/repo
+vagrant resume
+```
+
+#### Destroy
+To destroy a Vagrant machine and restart with a clean slate:
+````
+cd /path/to/stackinabox.io/repo
+vagrant destroy <vagrant-env-id>
+vagrant up
+```
+___
 ### Access Information
 [OPDK Terminal](http://192.168.27.100:4200/) - Available at http://192.168.27.100:4200/
 - Login with `vagrant`/`vagrant`
@@ -75,28 +101,7 @@ After the Vagrant machine is up, you can open your local web browser to the [Blu
 
 [UrbanCode Deploy Heat Engine](http://heat.stackinabox.io:8004) - Verify at http://heat.stackinabox.io:8004
 
-### Halt, Resume, or Destroy the Vagrant Machine
-You can run `vagrant global-status` to see a list of running Vagrant machines and their IDs.
-
-To halt/suspend a machine, naviagte to the directory where you cloned the stackinabox.io repository and execute `vagrant halt`:
-````
-cd /path/to/stackinabox.io/repo
-vagrant halt
-```
-
-To resume a halted machine and restore all previous work/data:
-````
-cd /path/to/stackinabox.io/repo
-vagrant resume
-```
-
-To destroy a Vagrant machine and restart with a clean slate:
-````
-cd /path/to/stackinabox.io/repo
-vagrant destroy <vagrant-env-id>
-vagrant up
-```
-
+___
 ### Additional Steps
 
 #### Connect the Blueprint Designer to AWS
@@ -112,6 +117,7 @@ cd /vagrant/patterns/jke
 
 Open your browser to the [JKE Tutorial](http://designer.stackinabox.io:9080/landscaper/view/tutorial) and login with `demo`/`labstack`.  You will see a "Guided Tour" frame on the right side of the browser window.  Follow the instructions which will guide you on how to deploy the JKE sample using UrbanCode Deploy and Blueprint Designer.
 
+___
 ### Troubleshooting
 
 #### Failure while downloading OPDK
@@ -139,7 +145,7 @@ $ vagrant box add /tmp/Downloads/opdk.box --name stackinabox/opdk
 Next, you must modify your Vagrantfile by adding a `config.vm.box.url` line and commenting out the `opdk.vm.box_version` line:
 ````
 ...
-config.vm.box_url = ["file:///Users/murad/Documents/Virtual Machines.localized/opdk.box"]
+config.vm.box_url = ["file:///tmp/Downloads/opdk.box"]
 config.vm.define "opdk" do |opdk|
 
 	opdk.vm.box = "stackinabox/opdk"
