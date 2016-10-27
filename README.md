@@ -16,6 +16,13 @@ It's planned to add further Docker images to this vagrant setup to support many 
   - [Salt Stack](https://saltstack.com/) (not yet implemented)
   - [Puppet](https://puppet.com/) (not yet implemented)
 
+### Shortcuts
+- [Setup](https://github.com/stackinabox/stackinabox.io#setup-instructions)
+- [Halt, Resume, or Destroy](https://github.com/stackinabox/stackinabox.io#halt-resume-or-destroy-the-vagrant-machine)
+- [Access Information](https://github.com/stackinabox/stackinabox.io#access-information)
+- [Additional Steps](https://github.com/stackinabox/stackinabox.io#additional-steps)
+- [Troubleshooting](https://github.com/stackinabox/stackinabox.io#troubleshooting)
+
 ___
 ### Setup Instructions
 
@@ -57,6 +64,7 @@ The `vagrant up` command will take a while to complete.  The project will downlo
 
 After the Vagrant machine is up, you can open your local web browser to the [Blueprint Designer](http://designer.stackinabox.io:9080/lanscaper) and login with `demo`/`labstack`.  The demo user is intended to be the primary user for building your automation.  The demo user belongs to a 'demo' team in the Blueprint Designer and has it's own tenant in the embedded [OpenStack](http://bluebox.stackinabox.io).  Additional login information is provided below.
 
+___
 ### Halt, Resume, or Destroy the Vagrant Machine
 You can run `vagrant global-status` to see a list of running Vagrant machines and their IDs.
 
