@@ -18,19 +18,19 @@ It's planned to add further Docker images to this vagrant setup to support many 
 
 ### Setup Instructions
 
-##### Download and install these tools  
+#### Download and install these tools  
 
   - [Oracle VirtualBox](https://www.virtualbox.org/wiki/Downloads)  
   - [Vagrant](https://www.vagrantup.com/downloads.html)
   - [Git](https://git-scm.com/) 
 
-##### Install required Vagrant plugins  
+#### Install required Vagrant plugins  
 ````
 vagrant plugin install vagrant-docker-compose
 vagrant plugin install vagrant-multi-hostsupdater
 ```
 
-##### Run `vagrant up`
+#### Run `vagrant up`
 Verify that VirtualBox, Vagrant, and Git are installed and running by typing `vboxmanage help`, `vagrant help`, and `git help` at the command shell.  
 
 Execute these commands:
@@ -43,7 +43,7 @@ vagrant up
 The `vagrant up` command will take a while to complete.  The project will download the OPDK (Open Patterns Development Kit) VirtualBox VM from atlas.hashicorp.com. Once downloaded, Vagrant will launch the VM in VirtualBox in "headless" mode (no GUI).  When the VM is up, Docker Compose is used to start the UrbanCode products in multiple containers.  The Vagrant project will also set several entries in your machine's `hosts` file, and this step may prompt for a password.  Ultimately you will see this output at the end of process, which is the result of running `docker-compose up`.
 
 ````
-....
+...
 ==> opdk: Creating ucddb
 ==> opdk: Creating heatengine
 ==> opdk: Creating blueprintdb
@@ -51,7 +51,7 @@ The `vagrant up` command will take a while to complete.  The project will downlo
 ==> opdk: Creating blueprintdesigner
 ==> opdk: Creating agent
 ==> opdk: Creating agent-relay
-....
+...
 ```
 
 After the Vagrant machine is up, you can open your local web browser to the [Blueprint Designer](http://designer.stackinabox.io:9080/lanscaper) and login with `demo`/`labstack`.  The demo user is intended to be the primary user for building your automation.  The demo user belongs to a 'demo' team in the Blueprint Designer and has it's own tenant in the embedded [OpenStack](http://bluebox.stackinabox.io).  Additional login information is provided below.
@@ -75,20 +75,6 @@ After the Vagrant machine is up, you can open your local web browser to the [Blu
 
 [UrbanCode Deploy Heat Engine](http://heat.stackinabox.io:8004) - Verify at http://heat.stackinabox.io:8004
 
-
-### Connect the Blueprint Designer to AWS
-Open your browser to the [OPDK web terminal](http://192.168.27.100:4200/), login, and execute `~/aws-setup.sh`.  Then follow the instructions at the end of the script execution.
-
-### Install the JKE Sample
-Open your browser to the [OPDK web terminal](http://192.168.27.100:4200/).  Login and execute the following commands:
-````
-git clone https://github.com/stackinabox/jke.git /vagrant/patterns/jke
-cd /vagrant/patterns/jke
-./init.sh
-```
-
-Open your browser to the [JKE Tutorial](http://designer.stackinabox.io:9080/landscaper/view/tutorial) and login with `demo`/`labstack`.  You will see a "Guided Tour" frame on the right side of the browser window.  Follow the instructions which will guide you on how to deploy the JKE sample using UrbanCode Deploy and Blueprint Designer.
-
 ### Halt, Resume, or Destroy the Vagrant Machine
 You can run `vagrant global-status` to see a list of running Vagrant machines and their IDs.
 
@@ -109,4 +95,60 @@ To destroy a Vagrant machine and restart with a clean slate:
 cd /path/to/stackinabox.io/repo
 vagrant destroy <vagrant-env-id>
 vagrant up
+```
+
+### Additional Steps
+
+#### Connect the Blueprint Designer to AWS
+Open your browser to the [OPDK web terminal](http://192.168.27.100:4200/), login, and execute `~/aws-setup.sh`.  Then follow the instructions at the end of the script execution.
+
+#### Install the JKE Sample
+Open your browser to the [OPDK web terminal](http://192.168.27.100:4200/).  Login and execute the following commands:
+````
+git clone https://github.com/stackinabox/jke.git /vagrant/patterns/jke
+cd /vagrant/patterns/jke
+./init.sh
+```
+
+Open your browser to the [JKE Tutorial](http://designer.stackinabox.io:9080/landscaper/view/tutorial) and login with `demo`/`labstack`.  You will see a "Guided Tour" frame on the right side of the browser window.  Follow the instructions which will guide you on how to deploy the JKE sample using UrbanCode Deploy and Blueprint Designer.
+
+### Troubleshooting
+
+#### Failure while downloading OPDK
+You may have timeout errors or see the following while downloading OPDK after running `vagrant up`:
+```
+==> opdk: Adding box 'stackinabox/opdk' (v0.9.4) for provider: virtualbox
+    opdk: Downloading: https://atlas.hashicorp.com/stackinabox/boxes/opdk/versions/0.9.4/providers/virtualbox.box
+==> opdk: Box download is resuming from prior download progress
+An error occurred while downloading the remote file. The error
+message, if any, is reproduced below. Please fix this error and try
+again.
+
+SSL read: error:00000000:lib(0):func(0):reason(0), errno 60
+```
+
+In this case you should download the OPDK VM directly via your browser (preferably using a download manager plugin).  Once you have the VirtalBox VM downloaded locally (`.box` file), you can add the VM to your Vagrant setup using a `vagrant box add` command:
+````
+$ vagrant box add /tmp/Downloads/opdk.box --name stackinabox/opdk
+==> box: Box file was not detected as metadata. Adding it directly...
+==> box: Adding box 'stackinabox/opdk' (v0) for provider: 
+    box: Unpacking necessary files from: file:///tmp/Downloads/opdk.box
+==> box: Successfully added box 'stackinabox/opdk' (v0) for 'virtualbox'!
+```
+
+Next, you must modify your Vagrantfile by adding a `config.vm.box.url` line and commenting out the `opdk.vm.box_version` line:
+````
+...
+config.vm.box_url = ["file:///Users/murad/Documents/Virtual Machines.localized/opdk.box"]
+config.vm.define "opdk" do |opdk|
+
+	opdk.vm.box = "stackinabox/opdk"
+      # opdk.vm.box_version = "= 0.9.4"
+...
+```
+
+Retrying the `vagrant up` command should now produce the following output to start:
+````
+Bringing machine 'opdk' up with 'virtualbox' provider...
+==> opdk: Importing base box 'stackinabox/opdk'...
 ```
