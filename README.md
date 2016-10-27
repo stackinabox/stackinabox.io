@@ -48,7 +48,7 @@ cd stackinabox.io/vagrant
 vagrant up
 ```
 
-The `vagrant up` command will take a while to complete.  The project will download the OPDK (Open Patterns Development Kit) VirtualBox VM from atlas.hashicorp.com. Once downloaded, Vagrant will launch the VM in VirtualBox in "headless" mode (no GUI).  When the VM is up, Docker Compose is used to start the UrbanCode products in multiple containers.  The Vagrant project will also set several entries in your machine's `hosts` file, and this step may prompt for a password.  Ultimately you will see this output at the end of the process after running `docker-compose up`:
+The `vagrant up` command will take a while to complete.  The project will download the OPDK (Open Patterns Development Kit) VirtualBox VM from atlas.hashicorp.com. Once downloaded, Vagrant will launch the VM in VirtualBox in "headless" mode (no GUI).  When the VM is up, Docker Compose is used to start the UrbanCode products in multiple containers.  The Vagrant project will also set several entries in your machine's `hosts` file, and this step may prompt for a password.  You will see this output at the end of the process coming from a `docker-compose up` command on the VM:
 ````
 ...
 ==> opdk: Creating ucddb
@@ -61,7 +61,7 @@ The `vagrant up` command will take a while to complete.  The project will downlo
 ...
 ```
 
-After the Vagrant machine is up, you can open your local web browser to the [Blueprint Designer](http://designer.stackinabox.io:9080/lanscaper) and login with `demo`/`labstack`.  The demo user is intended to be the primary user for building your automation.  The demo user belongs to a 'demo' team in the Blueprint Designer and has it's own tenant in the embedded [OpenStack](http://bluebox.stackinabox.io).  Additional login information is provided below.
+When the Vagrant environment is up, you can open your local web browser to the [Blueprint Designer](http://designer.stackinabox.io:9080/lanscaper) and login with `demo`/`labstack`.  The demo user is intended to be the primary user for building your automation.  The demo user belongs to a 'demo' team in the Blueprint Designer and has it's own tenant in the embedded [OpenStack](http://bluebox.stackinabox.io).  Additional login information is provided below.
 
 ___
 ### Halt, Resume, or Destroy the Vagrant Machine
