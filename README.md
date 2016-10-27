@@ -8,7 +8,7 @@ Using **stackinabox.io**, our hope is that you will share the automation you dev
 
 ### Future Integrations
 
-It's planned to add further Docker images to this vagrant setup to support many other deployment automation tools such as:  
+The plan is to add further Docker images to this Vagrant environment to support many other deployment automation tools such as:
 
   - [UrbanCode Build](https://developer.ibm.com/urbancode/products/urbancode-build/) (not yet implemented)
   - [UrbanCode Release](https://developer.ibm.com/urbancode/products/urbancode-release/) (not yet implemented)
