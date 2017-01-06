@@ -25,7 +25,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.define "opdk" do |opdk|
 
       opdk.vm.box = "stackinabox/opdk"
-      opdk.vm.box_version = "= 0.9.4"
+      opdk.vm.box_version = "= 0.9.6"
 
       # eth1, this will be OpenStacks's "management" network
       opdk.vm.network "private_network", ip: "192.168.27.100", adapter_ip: "192.168.27.1", netmask: "255.255.255.0", auto_config: true
@@ -35,17 +35,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       config.ssh.forward_agent = true
       config.ssh.insert_key = false
+      config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 
       if Vagrant.has_plugin?("vagrant-docker-compose")
         # sometimes is takes a second to get docker to startup
-        opdk.vm.provision "shell", inline: "sleep 20 || sudo systemctl restart docker.service || sleep 20", run: "always"
+        #opdk.vm.provision "shell", inline: "sleep 20 || sudo systemctl restart docker.service || sleep 20"
         opdk.vm.provision :docker
         opdk.vm.provision :docker_compose, 
           yml: "/vagrant/compose/urbancode/docker-compose.yml",
-          command_options: { rm: "", up: "-d --no-recreate --timeout 10"}, 
+          command_options: { rm: "", up: "-d --no-recreate --timeout 60" }, 
           project_name: "urbancode",
           compose_version: "1.8.0",
-          env: { DOCKER_HOST: "192.168.27.100:2375" },
+          options: "--host 192.168.27.100:2375",
           run: "always"
       else
         print "\n"
@@ -80,17 +81,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           vb.customize ["modifyvm", :id, "--clipboard", "disabled"]
           vb.customize ["modifyvm", :id, "--usbehci", "off"]
           vb.customize ["modifyvm", :id, "--vrde", "off"]
+          vb.customize ["guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 10000]
       end
 
-    end
-
-    if Vagrant.has_plugin?("vagrant-multi-hostsupdater")
-      config.multihostsupdater.aliases = {'192.168.27.100' => ['openstack.stackinabox.io', 'bluebox.stackinabox.io', 'docker.stackinabox.io', 'heat.stackinabox.io', 'designer.stackinabox.io', 'ucd.stackinabox.io', 'registry.stackinabox.io', 'docker.stackinabox.io', 'agent.stackinabox.io', 'blueprintdb.stackinabox.io']}
-    else
-        print "\n"
-        print "vagrant-multi-hostsupdater plugin has not been found.\n"
-        print "Please install it by running `vagrant plugin install vagrant-multi-hostsupdater`\n"
-        exit 22
     end
 
 end

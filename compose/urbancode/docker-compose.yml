@@ -22,7 +22,7 @@ services:
       - "3306"
     restart: always
   ucd:
-    image: stackinabox/urbancode-deploy:6.2.1.2.801550
+    image: stackinabox/urbancode-deploy:6.2.2.0.830952
     container_name: ucd
     ports:
       - "192.168.27.100:7918:7918"
@@ -43,14 +43,9 @@ services:
       - DATABASE_HOST=ucddb
       - DEPLOY_SERVER_URL=http://192.168.27.100:8080
       - DEPLOY_SERVER_HOSTNAME=192.168.27.100
-      - ADD_CLOUD_AGENT_PKGS=true
-    restart: "on-failure:2"
-    volumes:
-      - /vagrant/compose/urbancode/.volumes/ucd/cache:/cache
-      - /vagrant/compose/urbancode/wait-for-it.sh:/usr/local/bin/wait-for-it.sh
-    entrypoint: "wait-for-it.sh ucddb:3306 --timeout=60 -- /opt/startup.sh"
+    restart: always
   agent:
-    image: stackinabox/urbancode-deploy-agent:6.2.2.0.819509
+    image: stackinabox/urbancode-deploy-agent:6.2.2.0.834327
     container_name: agent
     environment:
       - DEPLOY_SERVER_HOSTNAME=192.168.27.100
@@ -62,7 +57,7 @@ services:
     volumes: 
       - /vagrant/compose/urbancode/.volumes/agent/file-imports:/file-import
   heatengine:
-    image: stackinabox/urbancode-patterns-engine:6.2.1.2.801498
+    image: stackinabox/urbancode-patterns-engine:6.2.2.0.825864
     container_name: heatengine
     privileged: true
     volumes:
@@ -79,9 +74,11 @@ services:
       - "8003"
       - "8004"
       - "35357"
+    environment:
+      - ALLOWED_AUTH_URIS=http://192.168.27.100/identity/v3
     restart: always
   blueprintdesigner:
-    image: stackinabox/urbancode-patterns-designer:6.2.1.2.801569
+    image: stackinabox/urbancode-patterns-designer:6.2.2.0.825900
     container_name: blueprintdesigner
     ports:
       - "192.168.27.100:9080:9080" 
@@ -97,7 +94,7 @@ services:
       - heatengine
     environment:
       - WEB_SERVER_HOSTNAME=192.168.27.100
-      - KEYSTONE_URL=http://192.168.27.100:5000/v2.0/
+      - KEYSTONE_URL=http://192.168.27.100/identity/v3
       - KEYSTONE_ADMIN_USER=admin
       - KEYSTONE_ADMIN_PASS=labstack
       - KEYSTONE_ADMIN_TENANT=admin
@@ -111,17 +108,17 @@ services:
       - DATABASE_USER=ibm_ucdp
       - DATABASE_PASS=aWJtX3VjZHAK
       - ENGINE_HOST=192.168.27.100
-      - DEPLOY_SERVER_URL=http://192.168.27.100:8080
+      - DEPLOY_SERVER_HOST=192.168.27.100
+      - DEPLOY_SERVER_PORT=8080
+      - DEPLOY_SERVER_PROTO=http
       - DOCKER_HOST=192.167.27.100
       - DOCKER_PORT=2376
       - DOCKER_PROTO=http
-    restart: "on-failure:10"
+    restart: always
     volumes:
-      - /vagrant/tutorial/:/opt/ibm-ucd-patterns/opt/tomcat/webapps/landscaper/static/6.2.1.2.801569/js/tutorial/nls/
-      - /vagrant/compose/urbancode/wait-for-it.sh:/usr/local/bin/wait-for-it.sh
-    entrypoint: "wait-for-it.sh blueprintdb:5432 --timeout=60 -- wait-for-it.sh ucd:8080 --timeout=300 -- wait-for-it.sh heatengine:8004 --timeout=300 -- /opt/startup.sh"
+      - /vagrant/tutorial/:/opt/ibm-ucd-patterns/opt/tomcat/webapps/landscaper/static/6.2.2.0.825900/js/tutorial/nls/
   agent-relay:
-    image: stackinabox/urbancode-deploy-agent-relay:6.2.2.0.818541
+    image: stackinabox/urbancode-deploy-agent-relay:6.2.2.0.834330
     container_name: agent-relay
     ports:
       - "192.168.27.100:20080:20080"
@@ -136,6 +133,16 @@ services:
     depends_on:
       - blueprintdesigner
     restart: always
+  ucd_agent_pkgs:
+    image: stackinabox/urbancode-deploy-agent-pkgs:6.2.2.0.825591
+    container_name: ucd_agent_pkgs
+    environment:
+      - DEPLOY_SERVER_HOST=192.168.27.100
+    depends_on:
+      - ucd
+      - blueprintdesigner
+    volumes:
+      - /vagrant/compose/urbancode/.volumes/ucd/cache:/cache
 
 networks:
   default: 
