@@ -25,7 +25,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.define "opdk" do |opdk|
 
       opdk.vm.box = "stackinabox/openstack"
-      opdk.vm.box_version = "= 0.9.7"
+      opdk.vm.box_version = "= 0.9.8"
       
       # eth1, this will be OpenStacks's "management" network
       opdk.vm.network "private_network", ip: "192.168.27.100", adapter_ip: "192.168.27.1", netmask: "255.255.255.0", auto_config: true
@@ -79,6 +79,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           vb.customize ["modifyvm", :id, "--usbehci", "off"]
           vb.customize ["modifyvm", :id, "--vrde", "off"]
           vb.customize ["guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 10000]
+          #fix for https://github.com/mitchellh/vagrant/issues/7648
+          vb.customize ['modifyvm', :id, '--cableconnected1', 'on']
+          vb.customize ['modifyvm', :id, '--cableconnected2', 'on']
+          vb.customize ['modifyvm', :id, '--cableconnected3', 'on']
       end
 
     end
