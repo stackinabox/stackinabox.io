@@ -8,7 +8,7 @@ Using **stackinabox.io**, our hope is that you will share the automation you dev
 
 Here's a video demonstrating some of the capabilites of stackinabox:  
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=YOUTUBE_VIDEO_ID_HERE
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=pmOThxI351g
 " target="_blank"><img src="http://img.youtube.com/vi/pmOThxI351g/0.jpg" 
 alt="IMAGE ALT TEXT HERE" width="640" height="480" border="10" /></a>
 
