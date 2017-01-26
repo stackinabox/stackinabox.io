@@ -35,7 +35,6 @@ ___
 #### Install required Vagrant plugins  
 ````
 vagrant plugin install vagrant-docker-compose
-vagrant plugin install vagrant-multi-hostsupdater
 ```
 
 #### Run `vagrant up`
@@ -48,7 +47,7 @@ cd stackinabox.io/vagrant
 vagrant up
 ```
 
-The `vagrant up` command will take a while to complete.  The project will download the OPDK (Open Patterns Development Kit) VirtualBox VM from atlas.hashicorp.com. Once downloaded, Vagrant will launch the VM in VirtualBox in "headless" mode (no GUI).  When the VM is up, Docker Compose is used to start the UrbanCode products in multiple containers.  The Vagrant project will also set several entries in your machine's `hosts` file, and this step may prompt for a password.  You will see this output at the end of the process coming from a `docker-compose up` command on the VM:
+The `vagrant up` command will take a while to complete.  The project will download the ```stackinabox/openstack``` vagrant box VirtualBox VM from atlas.hashicorp.com. Once downloaded, Vagrant will launch the VM in VirtualBox in "headless" mode (no GUI).  When the VM is up, Docker Compose is used to start the UrbanCode products in multiple containers.  You will see this output at the end of the process coming from a `docker-compose up` command on the VM:
 ````
 ...
 ==> opdk: Creating ucddb
@@ -61,7 +60,11 @@ The `vagrant up` command will take a while to complete.  The project will downlo
 ...
 ```
 
-When the Vagrant environment is up, you can open your local web browser to the [Blueprint Designer](http://designer.stackinabox.io:9080/lanscaper) and login with `demo`/`labstack`.  The demo user is intended to be the primary user for building your automation.  The demo user belongs to a 'demo' team in the Blueprint Designer and has it's own tenant in the embedded [OpenStack](http://bluebox.stackinabox.io).  Additional login information is provided below.
+When the Vagrant environment is up, you can open your local web browser to the [Blueprint Designer](http://designer.stackinabox.io) and login with `demo`/`labstack`.  The demo user is intended to be the primary user for building your automation.  The demo user belongs to a 'demo' team in the Blueprint Designer and has it's own tenant in the embedded [OpenStack](http://openstack.stackinabox.io).  Additional login information is provided below.
+
+### Important Tip:
+
+It is intended to run stackinabox on your laptop and NOT within another VM since it starts it's own VM environment.  If you are concerned about messing up your machine... DON'T BE, that's what Vagrant will manage the ```environment``` for you and ensure that your machine is not effected by any programs running inside the Vagrant environment. To learn more about Vagrant read the docs here: [http://www.vagrantup.com/docs](http://www.vagrantup.com/docs)
 
 ___
 ### Halt, Resume, or Destroy the Vagrant Machine
@@ -90,39 +93,57 @@ vagrant up
 ```
 ___
 ### Access Information
-[OPDK Terminal](http://192.168.27.100:4200/) - Available at http://192.168.27.100:4200/
-- Login with `vagrant`/`vagrant`
+[Web-Based Shell Terminal](http://shell.stackinabox.io) - Available at http://shell.stackinabox.io
+- Login with `demo`/`labstack` or `vagrant`/`vagrant`
 
 
 [OpenStack](http://openstack.stackinabox.io) - Available at http://openstack.stackinabox.io 
 - Login with `demo`/`labstack` or `admin`/`labstack`
 
 	 
-[UrbanCode Deploy Server](http://ucd.stackinabox.io:8080) - Available at http://ucd.stackinabox.io:8080
+[UrbanCode Deploy Server](http://ucd.stackinabox.io) - Available at http://ucd.stackinabox.io
 - Login with `admin`/`admin`
 
 
-[Blueprint Designer](http://designer.stackinabox.io:9080/landscaper) (Heat Template Designer) - Available at http://designer.stackinabox.io:9080/landscaper
+[Blueprint Designer](http://designer.stackinabox.io) (Heat Template Designer) - Available at http://designer.stackinabox.io
 - Login with `demo`/`labstack` or `ucdpadmin`/`ucdpadmin`
-
-
-[UrbanCode Deploy Heat Engine](http://heat.stackinabox.io:8004) - Verify at http://heat.stackinabox.io:8004
 
 ___
 ### Additional Steps
 
-#### Connect the Blueprint Designer to AWS
-Open your browser to the [OPDK web terminal](http://192.168.27.100:4200/), login, and execute `~/aws-setup.sh`.  Then follow the instructions at the end of the script execution.
-
 #### Install the JKE Sample
-Open your browser to the [OPDK web terminal](http://192.168.27.100:4200/).  Login and execute the following commands:
+Open your browser to the [Web Terminal](http://shell.stackinabox.io).  Login as the `demo` user with password `labstack` and execute the following commands:
 ````
-git clone https://github.com/stackinabox/jke.git /vagrant/patterns/jke
-cd /vagrant/patterns/jke
-./init.sh
+docker run --rm stackinabox/demo-jke
 ```
+To deploy and run the demo follow these steps:
 
-Open your browser to the [JKE Tutorial](http://designer.stackinabox.io:9080/landscaper/view/tutorial) and login with `demo`/`labstack`.  You will see a "Guided Tour" frame on the right side of the browser window.  Follow the instructions which will guide you on how to deploy the JKE sample using UrbanCode Deploy and Blueprint Designer.
+  1. Open your browser to the [Blueprint Designer](http://designer.stackinabox.io) and login with `demo`/`labstack`. 
+  2. Click on the `Repositories` link on the left-side of the page. Once the `Repositories` page loads click on the drop-down next to the `Repository` text at the top of the page and click the `Clone Repository` button at the bottom of the drop-down menu.  
+  3. In the `Repository URL` field enter `https://github.com/stackinabox/jke-blueprint.git` and click `Submit`. Once the repo is cloned you can click on the `Blueprints` tab on the left side of the page - the icon looks like a box and the tool tip says `Blueprints` when you hover your mouse over it.  You should now see a folder called `jke-blueprint` along with a `default` and `demo` folder.  
+  4. Click the triangle to the left of `jke-blueprint` to expand the folder.  Now you can open the JKE Blueprint by clicking on the `jke.yml` under the `jke-blueprint` folder. 
+  5. Click on the blue `Provision` button at the top of the page. The `Provision Blueprint to new Environment` dialog will pop up. Enter the following values for the fields presented in the dialog. 
+
+    - `Environment Name`: DEV
+    - `Agent Parameters`: leave alone
+    - `Image Parameters`:
+      - `Flavor`: `m1.small`
+      - `Key Name`: `demo_key`
+      - `Web Server Image`: `ubuntu-1404-amd64`
+      - `Database Server Image`: `ubuntu-1404-amd64`
+    - `Network Parameters`:
+      - `Availability Zone`: `nova`
+      - `Private Network`: `private`
+      - `Public Network`: `public`
+
+  6. Click on the blue `Provision` button at the bottom of the dialog
+  7. Click on the `Environments` tab on the left of the page. It looks like the letter `E`. You will see a table displaying the known `environments` that have been deployed via the `Blueprint Designer` that you have access to. You should see and entry in the table with the `DEV` `Environment` name and the `jke` `Applied Blueprint`.
+  8. Click on the `DEV` link under the `Environment` column corresponding to the `jke` `Applied Blueprint`.  This will load the `Environment` page for the blueprint you just provisioned. Wait here until all entries in the table show the green check circle icon with the text `Create Complete` beside it. 
+  9. Click on the `Outputs` link to the left of the page. This will bring you to the blueprints defined `outputs` page.  These are dynamically generated as part of provisioning the blueprint and help with finding the correct IP address of an application in a cloud environment that uses auto-assigned floating IPs.
+  10. Right-click on the link next to the `application_url` output value in the table to open the link in a new window/tab. This will open the `JKE Banking` application and load the landing page into your browser.
+  11. Login to the `JKE Banking` application using the username `jbrown` and the password `jbrown`
+  12. You can delete the provisioned blueprint for the `JKE Banking` application by going back to the [Blueprint Designer](http://designer.stackinabox.io/landscaper/view/environment) `Environments` page at: http://designer.stackinabox.io/landscaper/view/environment and clicking the red trash can icon under the `Actions` column on the right side of the page corresponding to the `DEV` environment you just provisioned.
+  13. Congrats! You just provisioned a blueprint.
 
 ___
 ### Troubleshooting
@@ -140,11 +161,11 @@ again.
 SSL read: error:00000000:lib(0):func(0):reason(0), errno 60
 ```
 
-In this case you should download the OPDK VM directly via your browser (preferably using a download manager plugin).  Once you have the VirtalBox VM downloaded locally (`.box` file), you can add the VM to your Vagrant setup using a `vagrant box add` command:
+In this case you should download the OpenStack VM directly via your browser (preferably using a download manager plugin) from [here](https://github.com/stackinabox/devstack/releases/latest/openstack.box) by clicking on the `openstack.box` link.  Once you have the VirtalBox VM downloaded locally (`.box` file), you can add the VM to your Vagrant setup using a `vagrant box add` command:
 ````
-$ vagrant box add /tmp/Downloads/opdk.box --name stackinabox/opdk
+$ vagrant box add /tmp/Downloads/openstack.box --name stackinabox/openstack
 ==> box: Box file was not detected as metadata. Adding it directly...
-==> box: Adding box 'stackinabox/opdk' (v0) for provider: 
+==> box: Adding box 'stackinabox/openstack' (v0) for provider: 
     box: Unpacking necessary files from: file:///tmp/Downloads/opdk.box
 ==> box: Successfully added box 'stackinabox/opdk' (v0) for 'virtualbox'!
 ```
@@ -155,7 +176,7 @@ Next, you must modify your Vagrantfile by adding a `config.vm.box.url` line and 
 config.vm.box_url = ["file:///tmp/Downloads/opdk.box"]
 config.vm.define "opdk" do |opdk|
 
-	opdk.vm.box = "stackinabox/opdk"
+	opdk.vm.box = "stackinabox/openstack"
       # opdk.vm.box_version = "= 0.9.4"
 ...
 ```
@@ -165,6 +186,3 @@ Retrying the `vagrant up` command should now produce the following output to sta
 Bringing machine 'opdk' up with 'virtualbox' provider...
 ==> opdk: Importing base box 'stackinabox/opdk'...
 ```
-
-#### `ttyname failed` and `Inappropriate ioctl for device` messages
-See this [issue](https://github.com/stackinabox/stackinabox.io/issues/1).
