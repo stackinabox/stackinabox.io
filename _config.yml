@@ -8,3 +8,8 @@ collections:
   uploads:
     title: Uploads
     output: true
+
+description: 
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-architect
