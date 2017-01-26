@@ -6,6 +6,12 @@
 
 Using **stackinabox.io**, our hope is that you will share the automation you develop with the larger community.  For an example, check out the [JKE Banking Application](https://github.com/stackinabox/jke).
 
+Here's a video demonstrating some of the capabilites of stackinabox:  
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=YOUTUBE_VIDEO_ID_HERE
+" target="_blank"><img src="http://img.youtube.com/vi/pmOThxI351g/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="640" height="480" border="10" /></a>
+
 ### Future Integrations
 
 The plan is to add further Docker images to this Vagrant environment to support many other deployment automation tools such as:
