@@ -41,15 +41,15 @@ services:
       - DATABASE_NAME=ibm_ucd
       - DATABASE_PORT=3306
       - DATABASE_HOST=ucddb
-      - DEPLOY_SERVER_URL=http://192.168.27.100:8080
-      - DEPLOY_SERVER_HOSTNAME=192.168.27.100
+      - DEPLOY_SERVER_URL=http://ucd.stackinabox.io
+      - DEPLOY_SERVER_HOSTNAME=ucd.stackinabox.io
     restart: always
   agent:
     image: stackinabox/urbancode-deploy-agent:6.2.2.0.834327
     container_name: agent
     environment:
-      - DEPLOY_SERVER_HOSTNAME=192.168.27.100
-      - DEPLOY_SERVER_URL=http://192.168.27.100:8080
+      - DEPLOY_SERVER_HOSTNAME=ucd.stackinabox.io
+      - DEPLOY_SERVER_URL=http://ucd.stackinabox.io
       - AGENT_NAME=importagent
     depends_on:
       - ucd
@@ -75,7 +75,7 @@ services:
       - "8004"
       - "35357"
     environment:
-      - ALLOWED_AUTH_URIS=http://192.168.27.100/identity/v3
+      - ALLOWED_AUTH_URIS=http://192.168.27.100:8888/identity/v3
     restart: always
   blueprintdesigner:
     image: stackinabox/urbancode-patterns-designer:6.2.2.0.825900
@@ -93,8 +93,8 @@ services:
       - ucd
       - heatengine
     environment:
-      - WEB_SERVER_HOSTNAME=192.168.27.100
-      - KEYSTONE_URL=http://192.168.27.100/identity/v3
+      - WEB_SERVER_HOSTNAME=designer.stackinabox.io
+      - KEYSTONE_URL=http://192.168.27.100:8888/identity/v3
       - KEYSTONE_ADMIN_USER=admin
       - KEYSTONE_ADMIN_PASS=labstack
       - KEYSTONE_ADMIN_TENANT=admin
@@ -108,15 +108,13 @@ services:
       - DATABASE_USER=ibm_ucdp
       - DATABASE_PASS=aWJtX3VjZHAK
       - ENGINE_HOST=192.168.27.100
-      - DEPLOY_SERVER_HOST=192.168.27.100
-      - DEPLOY_SERVER_PORT=8080
+      - DEPLOY_SERVER_HOST=ucd.stackinabox.io
+      - DEPLOY_SERVER_PORT=80
       - DEPLOY_SERVER_PROTO=http
       - DOCKER_HOST=192.167.27.100
       - DOCKER_PORT=2376
       - DOCKER_PROTO=http
     restart: always
-    volumes:
-      - /vagrant/tutorial/:/opt/ibm-ucd-patterns/opt/tomcat/webapps/landscaper/static/6.2.2.0.825900/js/tutorial/nls/
   agent-relay:
     image: stackinabox/urbancode-deploy-agent-relay:6.2.2.0.834330
     container_name: agent-relay
@@ -129,7 +127,7 @@ services:
       - "20081"
       - "7916"
     environment:
-      - UCD_SERVER=192.168.27.100
+      - UCD_SERVER=ucd.stackinabox.io
     depends_on:
       - blueprintdesigner
     restart: always
@@ -137,7 +135,7 @@ services:
     image: stackinabox/urbancode-deploy-agent-pkgs:6.2.2.0.825591
     container_name: ucd_agent_pkgs
     environment:
-      - DEPLOY_SERVER_HOST=192.168.27.100
+      - DEPLOY_SERVER_HOST=ucd.stackinabox.io
     depends_on:
       - ucd
       - blueprintdesigner

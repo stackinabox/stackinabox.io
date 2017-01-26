@@ -1,4 +1,4 @@
-# -*- mode: ruby -*-
+9# -*- mode: ruby -*-
 # vi: set ft=ruby :
 
 ENV["LC_ALL"] = "C.UTF-8"
@@ -7,7 +7,7 @@ ENV["LANG"] = "C.UTF-8"
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
-Vagrant.require_version ">= 1.8.5"
+Vagrant.require_version ">= 1.9.1"
 
 vagrant_dir = File.expand_path(File.dirname(__FILE__))
 personalization = File.expand_path(File.join(vagrant_dir, "Personalization"), __FILE__)
@@ -25,7 +25,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.define "opdk" do |opdk|
 
       opdk.vm.box = "stackinabox/openstack"
-      opdk.vm.box_version = "= 0.9.8"
+      opdk.vm.box_version = "= 0.9.9"
       
       # eth1, this will be OpenStacks's "management" network
       opdk.vm.network "private_network", ip: "192.168.27.100", adapter_ip: "192.168.27.1", netmask: "255.255.255.0", auto_config: true
