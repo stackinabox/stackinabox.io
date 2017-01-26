@@ -115,6 +115,8 @@ services:
       - DOCKER_PORT=2376
       - DOCKER_PROTO=http
     restart: always
+    volumes:
+      - /vagrant/tutorial/:/opt/ibm-ucd-patterns/opt/tomcat/webapps/landscaper/static/6.2.2.0.825900/js/tutorial/nls/
   agent-relay:
     image: stackinabox/urbancode-deploy-agent-relay:6.2.2.0.834330
     container_name: agent-relay
