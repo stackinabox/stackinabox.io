@@ -26,7 +26,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       opdk.vm.box = "stackinabox/openstack"
       opdk.vm.box_version = "= 0.9.9"
-      
+
       # eth1, this will be OpenStacks's "management" network
       opdk.vm.network "private_network", ip: "192.168.27.100", adapter_ip: "192.168.27.1", netmask: "255.255.255.0", auto_config: true
 
@@ -39,9 +39,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       if Vagrant.has_plugin?("vagrant-docker-compose")
         opdk.vm.provision :docker
-        opdk.vm.provision :docker_compose, 
+        opdk.vm.provision :docker_compose,
           yml: "/vagrant/compose/urbancode/docker-compose.yml",
-          command_options: { rm: "", up: "-d --no-recreate --timeout 90" }, 
+          command_options: { rm: "", up: "-d --no-recreate --timeout 90" },
           project_name: "urbancode",
           compose_version: "1.8.0",
           run: "always"
@@ -53,7 +53,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
 
       opdk.vm.provider :virtualbox do |vb|
-          
+
           # Use VBoxManage to customize the VM.
           vb.customize ["modifyvm", :id, "--ioapic", "on"] # turn on I/O APIC
           vb.customize ["modifyvm", :id, "--cpus", "#{$cpus}"] # set number of vcpus
@@ -84,6 +84,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           vb.customize ['modifyvm', :id, '--cableconnected2', 'on']
           vb.customize ['modifyvm', :id, '--cableconnected3', 'on']
       end
+
+            opdk.vm.provider :vmware_workstation do |vw|
+              vw.name = "stackinabox" # sets the name that virtual box will show in it's UI
+              vw.vmx["numvcpus"] = "#{$cpus}" # set number of vcpus
+              vw.vmx["memsize"] = "#{$memory}" # set amount of memory allocated vm memory
+            end
 
     end
 
