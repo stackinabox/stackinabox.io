@@ -24,7 +24,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     if $use_nfs == "true"
     	# this will override the default '/vagrant' shared folder settings and use nfs
-    	config.vm.synced_folder ".", "/vagrant"#, type: "nfs", mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+    	config.vm.synced_folder ".", "/vagrant", type: "nfs", mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
     end
 
     config.vm.define "opdk" do |opdk|
