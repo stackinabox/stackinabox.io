@@ -22,6 +22,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.vbguest.auto_update = false
     end
 
+    if $use_nfs == "true"
+    	# this will override the default '/vagrant' shared folder settings and use nfs
+    	config.vm.synced_folder ".", "/vagrant", type: "nfs", mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+    end
+
     config.vm.define "opdk" do |opdk|
 
       opdk.vm.box = "stackinabox/openstack"
@@ -85,11 +90,37 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           vb.customize ['modifyvm', :id, '--cableconnected3', 'on']
       end
 
-            opdk.vm.provider :vmware_workstation do |vw|
-              vw.name = "stackinabox" # sets the name that virtual box will show in it's UI
-              vw.vmx["numvcpus"] = "#{$cpus}" # set number of vcpus
-              vw.vmx["memsize"] = "#{$memory}" # set amount of memory allocated vm memory
-            end
+      opdk.vm.provider :vmware_desktop do |vw|
+          vw.vmx["displayName"] = "stackinabox" # sets the name that virtual box will show in it's UI
+          vw.vmx["numvcpus"] = "#{$cpus}" # set number of vcpus
+          vw.vmx["memsize"] = "#{$memory}" # set amount of memory allocated vm memory
+          vw.vmx["guestOS"] = "ubuntu-64"
+          vw.vmx["vhv.enable"] = "TRUE"
+          vw.vmx["vmx.allowNested"] = "TRUE"
+          vw.vmx["mainMem.allow8GB"] = "TRUE"
+          vw.vmx["vmx.superPriorityBoost"] = "TRUE"
+          vw.vmx["RemoteDisplay.vnc.enabled"] = "FALSE"
+
+          vw.vmx["ethernet0.present"] = "TRUE"
+          vw.vmx["ethernet0.startConnected"] = "TRUE"
+          vw.vmx["ethernet0.virtualDev"] = "vmxnet"
+          vw.vmx["ethernet0.connectionType"] = "nat"
+          vw.vmx["ethernet0.addresstype"] = "generated"
+
+          vw.vmx["ethernet1.present"] = "TRUE"
+          vw.vmx["ethernet1.startConnected"] = "TRUE"
+          vw.vmx["ethernet1.virtualDev"] = "vmxnet"
+          vw.vmx["ethernet1.connectionType"] = "custom"
+          vw.vmx["ethernet1.vnet"] = "vmnet2"
+          vw.vmx["ethernet1.addresstype"] = "generated"
+
+          vw.vmx["ethernet2.present"] = "TRUE"
+          vw.vmx["ethernet2.startConnected"] = "TRUE"
+          vw.vmx["ethernet2.virtualDev"] = "vmxnet"
+          vw.vmx["ethernet2.connectionType"] = "custom"
+          vw.vmx["ethernet2.vnet"] = "vmnet3"
+          vw.vmx["ethernet2.addresstype"] = "generated"
+      end
 
     end
 
