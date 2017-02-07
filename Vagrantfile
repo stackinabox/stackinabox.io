@@ -1,4 +1,4 @@
-9# -*- mode: ruby -*-
+# -*- mode: ruby -*-
 # vi: set ft=ruby :
 
 ENV["LC_ALL"] = "C.UTF-8"
