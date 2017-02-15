@@ -53,8 +53,8 @@ echo "     be charged for it's use."
 echo "#######################################################################"
 echo " "
 echo " "
-
-aws configure
+#Uncomment this if ~/.aws/credentials has not been created
+#aws configure
 
 AWS_ID=`cat ~/.aws/credentials | grep aws_access_key_id | head -1 | awk '{gsub(/\"/, "");gsub(/,/,""); print $3}'`
 AWS_KEY=`cat ~/.aws/credentials | grep aws_secret_access_key | head -1 | awk '{gsub(/\"/, "");gsub(/,/,""); print $3}'`
@@ -117,12 +117,12 @@ fi
 
 # delete existing 'ucdp-demo-key' key-pair
 aws ec2 delete-key-pair --key-name ucdp-demo-key
-rm -f .ssh/ucdp-demo-key.pem
+rm -f ~/.ssh/ucdp-demo-key.pem
 
 # create key-pair to use for ssh into instances in pubic/private subnets
-aws ec2 create-key-pair --key-name ucdp-demo-key --query 'KeyMaterial' --output text > ucdp-demo-key.pem
-chmod 400 ucdp-demo-key.pem
-mv ucdp-demo-key.pem .ssh/
+aws ec2 create-key-pair --key-name ucdp-demo-key --query 'KeyMaterial' --output text > ~/ucdp-demo-key.pem
+chmod 400 ~/ucdp-demo-key.pem
+mv ~/ucdp-demo-key.pem ~/.ssh/
 
 # find the "default" VPC for the account
 VPC_ID=`aws ec2 describe-vpcs | grep VpcId | head -1 | awk '{gsub(/\"/, "");gsub(/,/,""); print $2}'`
@@ -190,7 +190,7 @@ UCD_AGENT_RELAY_PUBLIC_HOST=`aws ec2 describe-instances --filters "Name=instance
 UCD_AGENT_RELAY_PRIVATE_HOST=`aws ec2 describe-instances --filters "Name=instance-id,Values=$UCD_AGENT_RELAY_INSTANCE_ID" | grep PrivateIpAddress | head -1 | awk '{gsub(/\"/, "");gsub(/,/,""); print $2}'`
 
 # create ssh tunnel remote tunnel (forward Agent Relay ports 20080,7916 to this vm on ports 8081,7918)
-./tunnel.sh .ssh/ucdp-demo-key.pem $UCD_AGENT_RELAY_PUBLIC_HOST $UCD_AGENT_RELAY_PRIVATE_HOST &>> aws-setup.log
+./tunnel.sh ~/.ssh/ucdp-demo-key.pem $UCD_AGENT_RELAY_PUBLIC_HOST $UCD_AGENT_RELAY_PRIVATE_HOST &>> aws-setup.log
 
 
 # create Amazon EC2 Cloud Provider in UCDP
