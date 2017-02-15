@@ -331,43 +331,44 @@ for item in data:
   if item['name'] == 'demo':
     print item['id']"`
 
-  curl -s -u ucdpadmin:ucdpadmin \
-     -H 'Content-Type: application/json' \
-     -X PUT \
-     -d "
-  {
-    \"name\": \"demo\",
-    \"roleMappings\": 
-    [
-      {
-        \"user\": \""$keystoneUser"\",
-        \"role\": \"00000000-0000-0000-0000-000000000004\"
-      },
-      {
-        \"user\": \""$keystoneUser"\",
-        \"role\": \"00000000-0000-0000-0000-000000000005\"
-      },
-      {
-        \"user\": \""$keystoneUser"\",
-        \"role\": \"00000000-0000-0000-0000-000000000301\"
-      },
-      {
-        \"user\": \""$keystoneUser"\",
-        \"role\": \"00000000-0000-0000-0000-000000000302\"
-      },
-      {
-        \"user\": \""$keystoneUser"\",
-        \"role\": \"00000000-0000-0000-0000-000000000303\"
-      }
-    ],
-    \"resources\": [],
-    \"cloud_projects\": [
-      \""$osCloudProject"\",
-      \""$EC2_CLOUD_PROJECT_ID"\"
-    ]
-  }
-  " \
-  http://192.168.27.100:9080/landscaper/security/team/$osDemoTeam
+#This bit trashes 6.2.3 users
+# curl -s -u ucdpadmin:ucdpadmin \
+#     -H 'Content-Type: application/json' \
+#     -X PUT \
+#     -d "
+#  {
+#    \"name\": \"demo\",
+#    \"roleMappings\": 
+#    [
+#      {
+#        \"user\": \""$keystoneUser"\",
+#        \"role\": \"00000000-0000-0000-0000-000000000004\"
+#      },
+#      {
+#        \"user\": \""$keystoneUser"\",
+#        \"role\": \"00000000-0000-0000-0000-000000000005\"
+#      },
+#      {
+#        \"user\": \""$keystoneUser"\",
+#        \"role\": \"00000000-0000-0000-0000-000000000301\"
+#      },
+#      {
+#        \"user\": \""$keystoneUser"\",
+#        \"role\": \"00000000-0000-0000-0000-000000000302\"
+#      },
+#      {
+#        \"user\": \""$keystoneUser"\",
+#        \"role\": \"00000000-0000-0000-0000-000000000303\"
+#      }
+#    ],
+#    \"resources\": [],
+#    \"cloud_projects\": [
+#      \""$osCloudProject"\",
+#      \""$EC2_CLOUD_PROJECT_ID"\"
+#    ]
+#  }
+#  " \
+#  http://192.168.27.100:9080/landscaper/security/team/$osDemoTeam
 
 echo "REGION: $AWS_REGION" >> aws-setup.log
 echo "VPC: $VPC_ID" >> aws-setup.log
