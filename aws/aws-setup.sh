@@ -5,7 +5,7 @@ rm -f ~/.aws/config
 cat >> ~/.aws/config <<EOF
 [default]
 output = json
-region = us-east-1
+region = ap-southeast-2
 EOF
 
 # install AWS command line tools
@@ -54,7 +54,7 @@ echo "#######################################################################"
 echo " "
 echo " "
 #Uncomment this if ~/.aws/credentials has not been created
-#aws configure
+aws configure
 
 AWS_ID=`cat ~/.aws/credentials | grep aws_access_key_id | head -1 | tr -s \ | cut -f 2 -d=`
 AWS_KEY=`cat ~/.aws/credentials | grep aws_secret_access_key | head -1 | tr -s \ | cut -f 2 -d=`
