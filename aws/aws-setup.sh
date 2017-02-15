@@ -56,8 +56,8 @@ echo " "
 #Uncomment this if ~/.aws/credentials has not been created
 #aws configure
 
-AWS_ID=`cat ~/.aws/credentials | grep aws_access_key_id | head -1 | awk '{gsub(/\"/, "");gsub(/,/,""); print $3}'`
-AWS_KEY=`cat ~/.aws/credentials | grep aws_secret_access_key | head -1 | awk '{gsub(/\"/, "");gsub(/,/,""); print $3}'`
+AWS_ID=`cat ~/.aws/credentials | grep aws_access_key_id | head -1 | tr -s \ | cut -f 2 -d=`
+AWS_KEY=`cat ~/.aws/credentials | grep aws_secret_access_key | head -1 | tr -s \ | cut -f 2 -d=`
 AWS_REGION=`cat ~/.aws/config | grep region | head -1 | awk '{gsub(/\"/, "");gsub(/,/,""); print $3}'`
 
 case "$AWS_REGION" in
@@ -257,7 +257,6 @@ if [[ "$EC2_CLOUD_PROJECT_ID" == "" ]]; then
     {
       \"name\": \"demo\",
       \"cloudProviderId\": \""$EC2_CLOUD_PROVIDER_ID"\",
-      \"existingId\": \""$EC2_CLOUD_PROJECT_ID"\",
       \"properties\": [
         {
           \"name\": \"functionalId\",
@@ -280,10 +279,6 @@ if [[ "$EC2_CLOUD_PROJECT_ID" == "" ]]; then
         },{
           \"name\": \"secretKey\",
           \"value\": \""$AWS_KEY"\",
-          \"secure\": false
-        },{
-          \"name\": \"defaultRegion\",
-          \"value\": \"RegionOne\",
           \"secure\": false
         }
       ]
@@ -372,7 +367,6 @@ curl -s -u ucdpadmin:ucdpadmin \
      \""$osCloudProject"\" :{},
      \""$EC2_CLOUD_PROJECT_ID"\" : {}
    },
-
    \"cloud_projects\": [
      \""$osCloudProject"\",
      \""$EC2_CLOUD_PROJECT_ID"\"
