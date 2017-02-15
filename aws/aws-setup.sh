@@ -257,6 +257,7 @@ if [[ "$EC2_CLOUD_PROJECT_ID" == "" ]]; then
     {
       \"name\": \"demo\",
       \"cloudProviderId\": \""$EC2_CLOUD_PROVIDER_ID"\",
+      \"existingId\": \""$EC2_CLOUD_PROJECT_ID"\",
       \"properties\": [
         {
           \"name\": \"functionalId\",
