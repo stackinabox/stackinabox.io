@@ -267,7 +267,13 @@ if [[ "$EC2_CLOUD_PROJECT_ID" == "" ]]; then
           \"name\": \"functionalPassword\",
           \"value\": \"labstack\",
           \"secure\": true
-        },{
+        },
+        {
+          \"name\":\"domain\",
+          \"value\":\"Default\",
+          \"secure\":false
+        },
+        {
           \"name\": \"accessId\",
           \"value\": \""$AWS_ID"\",
           \"secure\": false
