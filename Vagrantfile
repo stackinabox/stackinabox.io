@@ -1,4 +1,4 @@
-# -*- mode: ruby -*-
+9# -*- mode: ruby -*-
 # vi: set ft=ruby :
 
 ENV["LC_ALL"] = "C.UTF-8"
@@ -22,11 +22,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.vbguest.auto_update = false
     end
 
+    if $use_nfs == "true"
+    	# this will override the default '/vagrant' shared folder settings and use nfs
+    	#config.vm.synced_folder ".", "/vagrant"#, type: "nfs", mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+    end
+    #Coz this VM could be started outised of vagrant copy the required files in
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+    config.vm.provision "shell", privileged:true, inline: "mkdir -p /vagrant && chmod a+rwx /vagrant", run: "always"
+    config.vm.provision "file", source: "./compose", destination: "/vagrant", run: "always"
+    config.vm.provision "file", source: "./tutorial", destination: "/vagrant", run: "always"
+    config.vm.provision "file", source: "./scripts", destination: "/vagrant", run: "always"
     config.vm.define "opdk" do |opdk|
 
       opdk.vm.box = "stackinabox/openstack"
       opdk.vm.box_version = "= 0.9.9"
-      
+
       # eth1, this will be OpenStacks's "management" network
       opdk.vm.network "private_network", ip: "192.168.27.100", adapter_ip: "192.168.27.1", netmask: "255.255.255.0", auto_config: true
 
@@ -37,11 +47,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.ssh.insert_key = false
       config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 
-      if Vagrant.has_plugin?("vagrant-docker-compose")
-        opdk.vm.provision :docker
-        opdk.vm.provision :docker_compose, 
+       if Vagrant.has_plugin?("vagrant-docker-compose")
+         opdk.vm.provision :docker
+         opdk.vm.provision :docker_compose,
           yml: "/vagrant/compose/urbancode/docker-compose.yml",
-          command_options: { rm: "", up: "-d --no-recreate --timeout 90" }, 
+          command_options: { rm: "", up: "-d --no-recreate --timeout 90" },
           project_name: "urbancode",
           compose_version: "1.8.0",
           run: "always"
@@ -51,9 +61,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         print "Please install it by running `vagrant plugin install vagrant-docker-compose`\n"
         exit 22
       end
+      opdk.vm.provision "jke-demo", type: "shell", privileged: true, keep_color: false, path: File.expand_path(File.join(vagrant_dir, "scripts", "installJKE.sh"), __FILE__)
+      opdk.vm.provision "aws", type: "shell", privileged: true, keep_color: false, path: File.expand_path(File.join(vagrant_dir, "scripts", "awsprovider.sh"), __FILE__)
 
       opdk.vm.provider :virtualbox do |vb|
-          
+
           # Use VBoxManage to customize the VM.
           vb.customize ["modifyvm", :id, "--ioapic", "on"] # turn on I/O APIC
           vb.customize ["modifyvm", :id, "--cpus", "#{$cpus}"] # set number of vcpus
@@ -83,6 +95,38 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           vb.customize ['modifyvm', :id, '--cableconnected1', 'on']
           vb.customize ['modifyvm', :id, '--cableconnected2', 'on']
           vb.customize ['modifyvm', :id, '--cableconnected3', 'on']
+      end
+
+      opdk.vm.provider :vmware_desktop do |vw|
+          vw.vmx["displayName"] = "stackinabox" # sets the name that virtual box will show in it's UI
+          vw.vmx["numvcpus"] = "#{$cpus}" # set number of vcpus
+          vw.vmx["memsize"] = "#{$memory}" # set amount of memory allocated vm memory
+          vw.vmx["guestOS"] = "ubuntu-64"
+          vw.vmx["vhv.enable"] = "TRUE"
+          vw.vmx["vmx.allowNested"] = "TRUE"
+          vw.vmx["mainMem.allow8GB"] = "TRUE"
+          vw.vmx["vmx.superPriorityBoost"] = "TRUE"
+          vw.vmx["RemoteDisplay.vnc.enabled"] = "FALSE"
+
+          vw.vmx["ethernet0.present"] = "TRUE"
+          vw.vmx["ethernet0.startConnected"] = "TRUE"
+          vw.vmx["ethernet0.virtualDev"] = "vmxnet"
+          vw.vmx["ethernet0.connectionType"] = "nat"
+          vw.vmx["ethernet0.addresstype"] = "generated"
+
+          vw.vmx["ethernet1.present"] = "TRUE"
+          vw.vmx["ethernet1.startConnected"] = "TRUE"
+          vw.vmx["ethernet1.virtualDev"] = "vmxnet"
+          vw.vmx["ethernet1.connectionType"] = "custom"
+          vw.vmx["ethernet1.vnet"] = "vmnet2"
+          vw.vmx["ethernet1.addresstype"] = "generated"
+
+          vw.vmx["ethernet2.present"] = "TRUE"
+          vw.vmx["ethernet2.startConnected"] = "TRUE"
+          vw.vmx["ethernet2.virtualDev"] = "vmxnet"
+          vw.vmx["ethernet2.connectionType"] = "custom"
+          vw.vmx["ethernet2.vnet"] = "vmnet3"
+          vw.vmx["ethernet2.addresstype"] = "generated"
       end
 
     end
