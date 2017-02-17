@@ -2,7 +2,7 @@
 
 ### Introduction
 
-**stackinabox.io** is a Vagrant project that configures a single Ubuntu 14.04 VirtualBox VM with OpenStack and Docker. The project pulls Docker images for [UrbanCode Deploy](https://hub.docker.com/r/stackinabox/urbancode-deploy/), the UrbanCode Deploy [agent](https://hub.docker.com/r/stackinabox/urbancode-deploy-agent/) and [relay](https://hub.docker.com/r/stackinabox/urbancode-deploy-agent-relay/), the [UrbanCode Deploy Blueprint Designer](https://hub.docker.com/r/stackinabox/urbancode-patterns-designer/), and the [Blueprint Designer Engine](https://hub.docker.com/r/stackinabox/urbancode-patterns-engine/).  Using this Vagrant project, users are able to develop OpenStack Heat-based automation to deploy complex, multiplatform applications to the embedded [OpenStack](https://www.blueboxcloud.com/) instance or to any other cloud provider supported by the [Blueprint Designer](https://developer.ibm.com/urbancode/products/urbancode-deploy/features/blueprint-designer/), including [Amazon Web Services](https://aws.amazon.com/), [SoftLayer](http://www.softlayer.com/), [Azure](https://azure.microsoft.com/), or even your on-premise [VMware vCenter](https://www.vmware.com/products/vcenter-server).
+**stackinabox.io** is a Vagrant project that configures a single Ubuntu 16.04 VMWare VM with OpenStack and Docker. The project pulls Docker images for [UrbanCode Deploy](https://hub.docker.com/r/stackinabox/urbancode-deploy/), the UrbanCode Deploy [agent](https://hub.docker.com/r/stackinabox/urbancode-deploy-agent/) and [relay](https://hub.docker.com/r/stackinabox/urbancode-deploy-agent-relay/), the [UrbanCode Deploy Blueprint Designer](https://hub.docker.com/r/stackinabox/urbancode-patterns-designer/), and the [Blueprint Designer Engine](https://hub.docker.com/r/stackinabox/urbancode-patterns-engine/).  Using this Vagrant project, users are able to develop OpenStack Heat-based automation to deploy complex, multiplatform applications to the embedded [OpenStack](https://www.blueboxcloud.com/) instance or to any other cloud provider supported by the [Blueprint Designer](https://developer.ibm.com/urbancode/products/urbancode-deploy/features/blueprint-designer/), including [Amazon Web Services](https://aws.amazon.com/), [SoftLayer](http://www.softlayer.com/), [Azure](https://azure.microsoft.com/), or even your on-premise [VMware vCenter](https://www.vmware.com/products/vcenter-server).
 
 Using **stackinabox.io**, our hope is that you will share the automation you develop with the larger community.  For an example, check out the [JKE Banking Application](https://github.com/stackinabox/jke).
 
@@ -34,24 +34,34 @@ ___
 
 #### Download and install these tools  
 
-  - [Oracle VirtualBox](https://www.virtualbox.org/wiki/Downloads)  
+  - [VMWare WOrkstation](http://www.vmware.com/au/products/workstation-for-linux.html)  
   - [Vagrant](https://www.vagrantup.com/downloads.html)
-  - [Git](https://git-scm.com/) 
-
+  - [Git](https://git-scm.com/)
+  
+#### License Vagrant VMWare plugin
+ See https://www.vagrantup.com/vmware/
 #### Install required Vagrant plugins  
+   - [Vagrant VMware plugin](https://www.vagrantup.com/docs/vmware/installation.html)
 ````
 vagrant plugin install vagrant-docker-compose
 ```
 
 #### Run `vagrant up`
-Verify that VirtualBox, Vagrant, and Git are installed and running by typing `vboxmanage help`, `vagrant help`, and `git help` at the command shell.  
+Verify that VMware, Vagrant, and Git are installed and running by typing `vmrun`, `vagrant help`, and `git help` at the command shell.  
 
 Execute these commands:
 ````
 git clone https://github.com/stackinabox/stackinabox.io.git 
 cd stackinabox.io/vagrant
-vagrant up
+vagrant up --provider vmware_workstation 
 ```
+or
+````
+git clone https://github.com/stackinabox/stackinabox.io.git 
+cd stackinabox.io/vagrant
+vagrant up --provider vmware_fusion
+```
+
 
 The `vagrant up` command will take a while to complete.  The project will download the ```stackinabox/openstack``` vagrant box VirtualBox VM from atlas.hashicorp.com. Once downloaded, Vagrant will launch the VM in VirtualBox in "headless" mode (no GUI).  When the VM is up, Docker Compose is used to start the UrbanCode products in multiple containers.  You will see this output at the end of the process coming from a `docker-compose up` command on the VM:
 ````
@@ -167,7 +177,7 @@ again.
 SSL read: error:00000000:lib(0):func(0):reason(0), errno 60
 ```
 
-In this case you should download the OpenStack VM directly via your browser (preferably using a download manager plugin) from [here](https://github.com/stackinabox/devstack/releases/latest/openstack.box) by clicking on the `openstack.box` link.  Once you have the VirtalBox VM downloaded locally (`.box` file), you can add the VM to your Vagrant setup using a `vagrant box add` command:
+In this case you should download the OpenStack VM directly via your browser (preferably using a download manager plugin) from [here](https://github.com/stackinabox/devstack/releases/) by clicking on the `stackinabox_openstack_vmware_0.9.9.box` link.  Once you have the VMware VM downloaded locally (`.box` file), you can add the VM to your Vagrant setup using a `vagrant box add` command:
 ````
 $ vagrant box add /tmp/Downloads/openstack.box --name stackinabox/openstack
 ==> box: Box file was not detected as metadata. Adding it directly...
@@ -189,6 +199,6 @@ config.vm.define "opdk" do |opdk|
 
 Retrying the `vagrant up` command should now produce the following output to start:
 ````
-Bringing machine 'opdk' up with 'virtualbox' provider...
+Bringing machine 'opdk' up with 'vmware_workstation' provider...
 ==> opdk: Importing base box 'stackinabox/opdk'...
 ```
