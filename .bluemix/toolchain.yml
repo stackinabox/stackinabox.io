@@ -7,6 +7,7 @@ icon: data:image/svg+xml;base64,$file(icon.svg,base64)
 required:
  - deploy
  - git-repo
+ - trial-deploy
 
 # Github repos
 git-repo:

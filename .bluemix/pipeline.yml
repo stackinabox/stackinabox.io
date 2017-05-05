@@ -4,7 +4,7 @@ stages:
   inputs:
   - type: git
     branch: master
-    service: ${UCEP_REPO}
+    service: ${GIT_REPO}
   triggers:
   - type: commit
   properties:
