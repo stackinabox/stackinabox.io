@@ -1,0 +1,193 @@
+version: '2'
+services:
+  blueprintdb:
+    image: registry.ng.bluemix.net/stackinabox/postgres:9.6
+    container_name: blueprintdb
+    mem_limit: 1024
+    environment:
+      - POSTGRES_PASSWORD=aWJtX3VjZHAK 
+      - POSTGRES_USER=ibm_ucdp 
+      - POSTGRES_DATABASE=ibm_ucdp
+    expose:
+      - "5432"
+    restart: always
+  ucddb:
+    image: registry.ng.bluemix.net/stackinabox/mariadb
+    container_name: ucddb
+    mem_limit: 1024
+    environment:
+      - MYSQL_ROOT_PASSWORD=aWJtX3VjZHAK
+      - MYSQL_USER=ibm_ucd
+      - MYSQL_PASSWORD=passw0rd
+      - MYSQL_DATABASE=ibm_ucd
+    expose:
+      - "3306"
+    restart: always
+  ucd:
+    image: registry.ng.bluemix.net/stackinabox/urbancode-deploy:6.2.3.0.868537
+    container_name: ucd
+    mem_limit: 2048
+    ports:
+      - "169.46.152.22:7918:7918"
+      - "169.46.152.22:8080:8080"
+      - "169.46.152.22:8443:8443"
+    depends_on:
+      - ucddb
+    links:
+      - ucddb
+    environment:
+      - LICENSE=accept
+      - DATABASE_USER=ibm_ucd
+      - DATABASE_PASS=passw0rd
+      - DATABASE_NAME=ibm_ucd
+      - DATABASE_PORT=3306
+      - DATABASE_HOST=ucddb
+      - DEPLOY_SERVER_URL=http://169.46.152.22:8080
+      # - DEPLOY_SERVER_HOSTNAME=169.46.152.22
+    restart: always
+  agent:
+    image: registry.ng.bluemix.net/stackinabox/urbancode-deploy-agent:6.2.3.1.884469
+    container_name: agent
+    mem_limit: 1024
+    environment:
+      # - DEPLOY_SERVER_HOSTNAME=169.46.152.22
+      - DEPLOY_SERVER_URL=http://169.46.152.22:8080
+      - AGENT_NAME=importagent
+    depends_on:
+      - ucd
+    links:
+      - ucd
+    restart: always
+    # volumes: 
+    #   - /vagrant/compose/urbancode/.volumes/agent/file-imports:/file-import
+  heatdb:
+    image: registry.ng.bluemix.net/stackinabox/mariadb
+    container_name: heatdb
+    mem_limit: 1024
+    environment:
+      - MYSQL_USER=heat
+      - MYSQL_ROOT_PASSWORD=passw0rd
+      - MYSQL_PASSWORD=heat
+      - MYSQL_DATABASE=heat
+    expose:
+      - "3306"
+    restart: always
+  keystonedb:
+    image: registry.ng.bluemix.net/stackinabox/mariadb
+    container_name: keystonedb
+    mem_limit: 1024
+    environment:
+      - MYSQL_USER=keystone
+      - MYSQL_ROOT_PASSWORD=passw0rd
+      - MYSQL_PASSWORD=keystone
+      - MYSQL_DATABASE=keystone
+    expose:
+      - "3306"
+    restart: always
+  heatengine:
+    image: registry.ng.bluemix.net/stackinabox/urbancode-patterns-engine:6.2.3.0.867486
+    container_name: heatengine
+    mem_limit: 2048
+    depends_on:
+      - heatdb
+      - keystonedb
+    links:
+      - heatdb
+      - keystonedb
+    ports:
+      - "8000:8000"
+      - "8003:8003"
+      - "8004:8004"
+      - "8888:8888"
+      - "5000:5000"
+      - "35357:35357"
+    environment:
+      - ALLOWED_AUTH_URIS="http://heatengine:8888/identity/v3"
+      - IDENTITY_ADMIN_PASSWORD=openstack1
+      - HEAT_USER_PASSWORD=openstack1
+      - DEFAULT_EMAIL_ADDR=admin@stackinabox.io
+      - RABBITMQ_HOST=heatengine
+      - RABBITMQ_USER=stackrabbit
+      - RABBITMQ_PASSWD=labstack
+      - KEYSTONE_DB_HOST=keystonedb
+      - KEYSTONE_DB_PASSWD=keystone
+      - HEAT_DB_HOST=heatdb
+      - HEAT_DB_PASSWD=heat
+      - TERM=xterm
+      # - PUBLIC_HOSTNAME=$HEATENGINE_HOSTNAME
+    restart: always
+  blueprintdesigner:
+    image: registry.ng.bluemix.net/stackinabox/urbancode-patterns-designer:6.2.3.0.867483
+    container_name: blueprintdesigner
+    mem_limit: 2048
+    ports:
+      - "169.46.159.246:9080:9080" 
+      - "169.46.159.246:9443:9443"
+      - "169.46.159.246:7575:7575"
+    depends_on:
+      - blueprintdb
+      - ucd
+      - heatengine
+    links:
+      - blueprintdb
+      - ucd
+      - heatengine
+    environment:
+      # - WEB_SERVER_HOSTNAME=$WEBSERVER_HOSTNAME
+      - KEYSTONE_URL="http://heatengine:8888/identity/v3"
+      - KEYSTONE_ADMIN_USER=admin
+      - KEYSTONE_ADMIN_PASS=openstack1
+      - KEYSTONE_ADMIN_TENANT=admin
+      - KEYSTONE_USER=admin
+      - KEYSTONE_PASS=openstack1
+      - KEYSTONE_TENANT=admin
+      - KEYSTONE_DOMAIN=Default
+      - DATABASE_HOST=blueprintdb
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=ibm_ucdp
+      - DATABASE_USER=ibm_ucdp
+      - DATABASE_PASS=aWJtX3VjZHAK
+      - ENGINE_HOST=heatengine
+      - DEPLOY_SERVER_HOST=169.46.152.22
+      - DEPLOY_SERVER_PORT=8080
+      - DEPLOY_SERVER_PROTO=http
+    restart: always
+  # agent-relay:
+  #   image: registry.ng.bluemix.net/stackinabox/urbancode-deploy-agent-relay:6.2.3.1.883612
+  #   container_name: agent-relay
+  #   ports:
+  #     - "20080:20080"
+  #     - "20081:20081"
+  #     - "7916:7916"
+  #   expose:
+  #     - "20080"
+  #     - "20081"
+  #     - "7916"
+  #   environment:
+  #     - UCD_SERVER=169.46.152.22
+  #   depends_on:
+  #     - blueprintdesigner
+  #   restart: always
+  ucd_agent_pkgs:
+    image: registry.ng.bluemix.net/stackinabox/urbancode-deploy-agent-pkgs:6.2.3.1.884542
+    container_name: ucd_agent_pkgs
+    environment:
+      - DEPLOY_SERVER_HOST=169.46.152.22
+    depends_on:
+      - ucd
+      - blueprintdesigner
+    links:
+      - ucd
+      - blueprintdesigner
+    # volumes:
+    #   - /vagrant/compose/urbancode/.volumes/ucd/cache:/cache
+
+networks:
+  default: 
+    # driver: bridge
+    # driver_opts:
+    #   com.docker.network.bridge.name: "stackbr0"
+    #   com.docker.network.bridge.enable_ip_masquerade: "true"
+    #   com.docker.network.bridge.enable_icc: "true"
+    #   # com.docker.network.bridge.host_binding_ipv4: "192.168.27.100"
+    #   # com.docker.network.mtu: "1450"

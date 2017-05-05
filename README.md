@@ -32,6 +32,9 @@ The plan is to add further Docker images to this Vagrant environment to support 
 ___
 ### Setup Instructions
 
+#### Try it On Bluemix!
+[![Deploy to Bluemix](https://bluemix.net/deploy/button.svg)](https://bluemix.net/deploy?repository=https://github.com/stackinabox/stackinabox.io.git> # [required])
+
 #### Download and install these tools  
 
   - [Oracle VirtualBox](https://www.virtualbox.org/wiki/Downloads)  

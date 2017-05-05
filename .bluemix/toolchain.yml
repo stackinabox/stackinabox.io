@@ -1,0 +1,44 @@
+---
+name: "Deploy UrbanCode Enterprise Platform to Bluemix"
+description: "Toolchain to deploy UrbanCode Enterprise Platform trial to Bluemix"
+version: 0.1
+image: data:image/svg+xml;base64,$file(toolchain.svg,base64)
+icon: data:image/svg+xml;base64,$file(icon.svg,base64)
+required:
+ - deploy
+ - ucep-repo
+
+# Github repos
+ucep-repo:
+  service_id: githubpublic
+  parameters:
+    repo_name: "{{name}}"
+    repo_url: https://github.com/stackinabox/stackinabox.io.git
+    type: fork
+    has_issues: false
+
+# Pipelines
+trial-deploy:
+  service_id: pipeline
+  parameters:
+    name: "{{name}}"
+    ui-pipeline: true
+    configuration:
+     content: $file(pipeline.yml)
+     env:
+      SAMPLE_REPO: "ucep-repo"
+      CF_APP_NAME: "{{deploy.parameters.prod-app-name}}"
+      PROD_SPACE_NAME: "{{deploy.parameters.prod-space}}"
+      PROD_ORG_NAME: "{{deploy.parameters.prod-organization}}"
+      PROD_REGION_ID: "{{deploy.parameters.prod-region}}"
+     execute: true
+    services: ["ucep-repo"]
+  hidden: [form, description]
+
+#Deployment
+deploy:
+  schema:
+    $ref: deploy.json
+  service-category: pipeline
+  parameters:
+    prod-app-name: "{{ucep-repo.parameters.repo_name}}"

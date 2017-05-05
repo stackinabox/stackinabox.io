@@ -3,6 +3,7 @@
 !.gitignore
 !.git*
 !.travis.yml
+!.bluemix
 
 # ignore all temporary files and ahp specific files
 *.bak

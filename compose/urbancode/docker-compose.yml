@@ -11,7 +11,7 @@ services:
       - "5432"
     restart: always
   ucddb:
-    image: mysql:5.6
+    image: mariadb
     container_name: ucddb
     environment:
       - MYSQL_ROOT_PASSWORD=aWJtX3VjZHAK
@@ -22,8 +22,10 @@ services:
       - "3306"
     restart: always
   ucd:
-    image: stackinabox/urbancode-deploy:6.2.2.0.830952
+    image: stackinabox/urbancode-deploy:6.2.3.0.868537
     container_name: ucd
+    domainname: stackinabox.io
+    hostname: ucd
     ports:
       - "192.168.27.100:7918:7918"
       - "192.168.27.100:8080:8080"
@@ -45,7 +47,7 @@ services:
       - DEPLOY_SERVER_HOSTNAME=ucd.stackinabox.io
     restart: always
   agent:
-    image: stackinabox/urbancode-deploy-agent:6.2.2.0.834327
+    image: stackinabox/urbancode-deploy-agent:6.2.3.1.884469
     container_name: agent
     environment:
       - DEPLOY_SERVER_HOSTNAME=ucd.stackinabox.io
@@ -56,30 +58,63 @@ services:
     restart: always
     volumes: 
       - /vagrant/compose/urbancode/.volumes/agent/file-imports:/file-import
+  heatdb:
+    image: mariadb
+    container_name: heatdb
+    environment:
+      - MYSQL_USER=heat
+      - MYSQL_ROOT_PASSWORD=passw0rd
+      - MYSQL_PASSWORD=heat
+      - MYSQL_DATABASE=heat
+    expose:
+      - "3306"
+    restart: always
+  keystonedb:
+    image: mariadb
+    container_name: keystonedb
+    environment:
+      - MYSQL_USER=keystone
+      - MYSQL_ROOT_PASSWORD=passw0rd
+      - MYSQL_PASSWORD=keystone
+      - MYSQL_DATABASE=keystone
+    expose:
+      - "3306"
+    restart: always
   heatengine:
-    image: stackinabox/urbancode-patterns-engine:6.2.2.0.825864
+    image: stackinabox/urbancode-patterns-engine:6.2.3.0.867486
     container_name: heatengine
-    privileged: true
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - /vagrant/compose/urbancode/envvars.txt:/root/envvars.txt:ro
+    domainname: stackinabox.io
+    hostname: heat
+    environment:
+      - ALLOWED_AUTH_URIS=http://192.168.27.100:8888/identity/v3
+      - IDENTITY_ADMIN_PASSWORD=openstack1
+      - HEAT_USER_PASSWORD=openstack1
+      - DEFAULT_EMAIL_ADDR=admin@stackinabox.io
+      - RABBITMQ_HOST=192.168.27.100
+      - RABBITMQ_USER=stackrabbit
+      - RABBITMQ_PASSWD=labstack
+      - KEYSTONE_DB_HOST=keystonedb
+      - KEYSTONE_DB_PASSWD=keystone
+      - HEAT_DB_HOST=heatdb
+      - HEAT_DB_PASSWD=heat
+      - TERM=xterm
+      - HOST_PUBLIC_IP_ADDRESS=192.168.27.100
+    depends_on:
+      - heatdb
+      - keystonedb
     ports:
       - "192.168.27.100:8000:8000"
       - "192.168.27.100:8003:8003"
       - "192.168.27.100:8004:8004"
     expose:
       - "5000"
-      - "5672"
-      - "8000"
-      - "8003"
-      - "8004"
       - "35357"
-    environment:
-      - ALLOWED_AUTH_URIS=http://192.168.27.100:8888/identity/v3
     restart: always
   blueprintdesigner:
-    image: stackinabox/urbancode-patterns-designer:6.2.2.0.825900
+    image: stackinabox/urbancode-patterns-designer:6.2.3.0.867483
     container_name: blueprintdesigner
+    domainname: stackinabox.io
+    hostname: designer
     ports:
       - "192.168.27.100:9080:9080" 
       - "192.168.27.100:9443:9443"
@@ -113,12 +148,10 @@ services:
       - DEPLOY_SERVER_PROTO=http
       - DOCKER_HOST=192.167.27.100
       - DOCKER_PORT=2376
-      - DOCKER_PROTO=http
+      - DOCKER_PROTO=tcp
     restart: always
-    volumes:
-      - /vagrant/tutorial/:/opt/ibm-ucd-patterns/opt/tomcat/webapps/landscaper/static/6.2.2.0.825900/js/tutorial/nls/
   agent-relay:
-    image: stackinabox/urbancode-deploy-agent-relay:6.2.2.0.834330
+    image: stackinabox/urbancode-deploy-agent-relay:6.2.3.1.883612
     container_name: agent-relay
     ports:
       - "192.168.27.100:20080:20080"
@@ -134,7 +167,7 @@ services:
       - blueprintdesigner
     restart: always
   ucd_agent_pkgs:
-    image: stackinabox/urbancode-deploy-agent-pkgs:6.2.2.0.825591
+    image: stackinabox/urbancode-deploy-agent-pkgs:6.2.3.1.884542
     container_name: ucd_agent_pkgs
     environment:
       - DEPLOY_SERVER_HOST=ucd.stackinabox.io
@@ -151,5 +184,5 @@ networks:
       com.docker.network.bridge.name: "stackbr0"
       com.docker.network.bridge.enable_ip_masquerade: "true"
       com.docker.network.bridge.enable_icc: "true"
-      om.docker.network.bridge.host_binding_ipv4: "192.168.27.100"
+      com.docker.network.bridge.host_binding_ipv4: "192.168.27.100"
       com.docker.network.mtu: "1450"
