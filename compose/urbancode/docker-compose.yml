@@ -78,7 +78,7 @@ services:
       - ALLOWED_AUTH_URIS=http://192.168.27.100:8888/identity/v3
     restart: always
   blueprintdesigner:
-    image: stackinabox/urbancode-patterns-designer:6.2.2.0.825900
+    image: stackinabox/urbancode-patterns-designer:6.2.3.0.867483
     container_name: blueprintdesigner
     ports:
       - "192.168.27.100:9080:9080" 
