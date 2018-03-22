@@ -45,7 +45,7 @@ ___
 #### Install required Vagrant plugins  
 ````
 vagrant plugin install vagrant-docker-compose
-```
+````
 
 #### Run `vagrant up`
 Verify that VirtualBox, Vagrant, and Git are installed and running by typing `vboxmanage help`, `vagrant help`, and `git help` at the command shell.  
@@ -55,7 +55,7 @@ Execute these commands:
 git clone https://github.com/stackinabox/stackinabox.io.git 
 cd stackinabox.io/vagrant
 vagrant up
-```
+````
 
 The `vagrant up` command will take a while to complete.  The project will download the ```stackinabox/openstack``` vagrant box VirtualBox VM from atlas.hashicorp.com. Once downloaded, Vagrant will launch the VM in VirtualBox in "headless" mode (no GUI).  When the VM is up, Docker Compose is used to start the UrbanCode products in multiple containers.  You will see this output at the end of the process coming from a `docker-compose up` command on the VM:
 ````
@@ -68,7 +68,7 @@ The `vagrant up` command will take a while to complete.  The project will downlo
 ==> opdk: Creating agent
 ==> opdk: Creating agent-relay
 ...
-```
+````
 
 When the Vagrant environment is up, you can open your local web browser to the [Blueprint Designer](http://designer.stackinabox.io) and login with `demo`/`labstack`.  The demo user is intended to be the primary user for building your automation.  The demo user belongs to a 'demo' team in the Blueprint Designer and has it's own tenant in the embedded [OpenStack](http://openstack.stackinabox.io).  Additional login information is provided below.
 
@@ -85,14 +85,14 @@ To halt/suspend a machine, naviagte to the directory where you cloned the stacki
 ````
 cd /path/to/stackinabox.io/repo
 vagrant halt
-```
+````
 
 #### Resume
 To resume a halted machine and restore all previous work/data:
 ````
 cd /path/to/stackinabox.io/repo
 vagrant resume
-```
+````
 
 #### Destroy
 To destroy a Vagrant machine and restart with a clean slate:
@@ -100,7 +100,7 @@ To destroy a Vagrant machine and restart with a clean slate:
 cd /path/to/stackinabox.io/repo
 vagrant destroy <vagrant-env-id>
 vagrant up
-```
+````
 ___
 ### Access Information
 [Web-Based Shell Terminal](http://shell.stackinabox.io) - Available at http://shell.stackinabox.io
@@ -125,7 +125,7 @@ ___
 Open your browser to the [Web Terminal](http://shell.stackinabox.io).  Login as the `demo` user with password `labstack` and execute the following commands:
 ````
 docker run --rm stackinabox/demo-jke
-```
+````
 To deploy and run the demo follow these steps:
 
   1. Open your browser to the [Blueprint Designer](http://designer.stackinabox.io) and login with `demo`/`labstack`. 
@@ -160,7 +160,7 @@ ___
 
 #### Failure while downloading OPDK
 You may have timeout errors or see the following while downloading OPDK after running `vagrant up`:
-```
+````
 ==> opdk: Adding box 'stackinabox/opdk' (v0.9.4) for provider: virtualbox
     opdk: Downloading: https://atlas.hashicorp.com/stackinabox/boxes/opdk/versions/0.9.4/providers/virtualbox.box
 ==> opdk: Box download is resuming from prior download progress
@@ -169,7 +169,7 @@ message, if any, is reproduced below. Please fix this error and try
 again.
 
 SSL read: error:00000000:lib(0):func(0):reason(0), errno 60
-```
+````
 
 In this case you should download the OpenStack VM directly via your browser (preferably using a download manager plugin) from [here](https://github.com/stackinabox/devstack/releases/latest/openstack.box) by clicking on the `openstack.box` link.  Once you have the VirtalBox VM downloaded locally (`.box` file), you can add the VM to your Vagrant setup using a `vagrant box add` command:
 ````
@@ -178,7 +178,7 @@ $ vagrant box add /tmp/Downloads/openstack.box --name stackinabox/openstack
 ==> box: Adding box 'stackinabox/openstack' (v0) for provider: 
     box: Unpacking necessary files from: file:///tmp/Downloads/opdk.box
 ==> box: Successfully added box 'stackinabox/opdk' (v0) for 'virtualbox'!
-```
+````
 
 Next, you must modify your Vagrantfile by adding a `config.vm.box.url` line and commenting out the `opdk.vm.box_version` line:
 ````
@@ -189,10 +189,10 @@ config.vm.define "opdk" do |opdk|
 	opdk.vm.box = "stackinabox/openstack"
       # opdk.vm.box_version = "= 0.9.4"
 ...
-```
+````
 
 Retrying the `vagrant up` command should now produce the following output to start:
 ````
 Bringing machine 'opdk' up with 'virtualbox' provider...
 ==> opdk: Importing base box 'stackinabox/opdk'...
-```
+````
