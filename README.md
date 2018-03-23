@@ -47,7 +47,6 @@ ___
 vagrant plugin install vagrant-docker-compose
 ```
 
-#### Run `vagrant up`
 Verify that VirtualBox, Vagrant, and Git are installed and running by typing `vboxmanage help`, `vagrant help`, and `git help` at the command shell.  
 
 Execute these commands:
